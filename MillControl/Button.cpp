@@ -5,9 +5,7 @@
 unsigned char Button::n_buttons = 0;
 Button* Button::buttons[MAX_BUTTONS];
 
-Button::Button(unsigned char pin, bool multiClick) : button(pin, LOW, false) {
-    //configure clickbutton
-    //button = *new ClickButton(pin, LOW, false);
+Button::Button(unsigned char pin, bool multiClick) : button(pin, LOW, true) {
     button.debounceTime = 5;
     if (multiClick)
         setMultiClickButton();
