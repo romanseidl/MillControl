@@ -36,7 +36,7 @@ There is an extensive editor allowing you to add (+), delete (x), move (<>) and 
 #####Landscape Mode
 ![Landscape Editor](https://raw.githubusercontent.com/romanseidl/MillControl/gh-pages/pictures/quer_editor.JPG)
 
-####Edit a Time Mode
+####Run!!
 Finally the idea of the timer ist to run. So there is a run mode... It is started from select mode as explained above. In a timed run there is a progress bar at the bottom of the screen.
 
 A run can be stopped any time by pressing the button used to start the run. For 5 seconds the run will pause and if you re-click it can be continued. 
