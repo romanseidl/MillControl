@@ -42,16 +42,25 @@
 //Pins - change as you like
 #define ENCODER_BUTTON_PIN 4
 #define MILL_BUTTON_PIN 5
+#define MILL_BUTTON2_PIN 6
 
 //If you don't have a mill button go to UI.h and comment out the define!
 
 //This will change the button settings - do not change
 #ifdef MILL_BUTTON
-    Button UI::millButton(MILL_BUTTON_PIN, Button::MULTI_CLICK);
-    Button UI::encoderButton(ENCODER_BUTTON_PIN, Button::SINGLE_CLICK);
+    #ifdef MILL_BUTTON_2
+        Button UI::millButton(MILL_BUTTON_PIN, Button::MULTI_CLICK);
+        Button UI::millButton2(MILL_BUTTON2_PIN, Button::MULTI_CLICK);
+        Button UI::encoderButton(ENCODER_BUTTON_PIN, Button::SINGLE_CLICK);
+    #else
+        Button UI::millButton(MILL_BUTTON_PIN, Button::MULTI_CLICK);
+        Button UI::millButton2 = UI::millButton;
+        Button UI::encoderButton(ENCODER_BUTTON_PIN, Button::SINGLE_CLICK);
+    #endif
 #else
     Button UI::millButton(ENCODER_BUTTON_PIN, Button::MULTI_CLICK);
-    Button UI::encoderButton= UI::millButton;
+    Button UI::millButton2 = UI::millButton;
+    Button UI::encoderButton = UI::millButton;
 #endif
 
 //=================================================
@@ -68,8 +77,26 @@ const int UI::PAUSE_TIME = 5;
 
 //=================================================
 // Display
+// You can either connect a SPI or a I2C display. SPI is mcuh faster but may be a bit annoying to find th right pinout
 
-U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64(U8G_I2C_OPT_NO_ACK);
+// i2c
+//U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64_2X(U8G_I2C_OPT_NO_ACK);
+
+//SPI
+//These are sensible defaults for Arduino Mini pro. If you use different Hardware and use Hardware SPI you might need to adapt them
+#define OLED_SCK 13  // also called: CLK, SCL
+#define OLED_MOSI 11 // also called: SDA, SID
+#define OLED_MISO 9  // also called: a0, D/C,  DC, RS
+#define OLED_RESET 8 // also called: RES, RST
+#define OLED_CS 10   // also called: SS, ST
+
+//Software SPI
+//U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64_2X(OLED_SCK, OLED_MOSI, OLED_CS, OLED_MISO, OLED_RESET);
+
+//Hardware SPI
+U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64_2X(OLED_CS, OLED_MISO, OLED_RESET);
+
+
 #ifdef PORTRAIT_DISPLAY
     const unsigned char UI::DISPLAY_WIDTH = 64;
     const unsigned char UI::DISPLAY_HEIGHT = 128;
@@ -80,10 +107,11 @@ U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64(U8G_I2C_OPT_NO_ACK);
 //=================================================
 // Fonts
 
-const u8g_fntpgm_uint8_t* UI::FONT_SMALL{u8g_font_helvB14};
-const u8g_fntpgm_uint8_t* UI::FONT_REGULAR{u8g_font_helvR14};
-const u8g_fntpgm_uint8_t* UI::FONT_BOLD{u8g_font_helvB14};
-const u8g_fntpgm_uint8_t* UI::FONT_LARGE{u8g_font_fub20n};
+const u8g_fntpgm_uint8_t* UI::FONT_SMALL{u8g_font_helvB10};
+const u8g_fntpgm_uint8_t* UI::FONT_NUMERIC{u8g_font_helvR14n};
+//const u8g_fntpgm_uint8_t* UI::FONT_NUMERIC{u8g_font_helvB14};
+const u8g_fntpgm_uint8_t* UI::FONT_REGULAR{u8g_font_helvB14};
+const u8g_fntpgm_uint8_t* UI::FONT_LARGE_NUMERIC{u8g_font_fub20n};
 const char UI::SYMBOL_LONG[] = {187, 0};
 
 void setup(void) {
