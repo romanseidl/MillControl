@@ -9,7 +9,7 @@
 
 class Run : public State {
 
-    static const unsigned char RELAY_PIN = 10;
+    static const unsigned char RELAY_PIN = 7;
     static const unsigned char ON = LOW;
     static const unsigned char OFF = HIGH;
 

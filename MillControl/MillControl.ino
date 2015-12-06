@@ -44,6 +44,8 @@
 #define MILL_BUTTON_PIN 5
 #define MILL_BUTTON2_PIN 6
 
+//The relay Pin is seht in Run.h
+
 //If you don't have a mill button go to UI.h and comment out the define!
 
 //This will change the button settings - do not change
