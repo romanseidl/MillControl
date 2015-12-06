@@ -2,7 +2,7 @@
 #include "MillControl.h"
 
 const char CharEditor::CHARACTERS[]= " ABCDEFGHIJLKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890/-+*&!?:#'()[]";
-const unsigned char CharEditor::CHARACTERS_COUNT = sizeof( CharEditor::CHARACTERS);
+const unsigned char CharEditor::CHARACTERS_COUNT = sizeof(CharEditor::CHARACTERS) - 1;
 
 void CharEditor::start() {
     c = MillControl::EDITOR.getChar();

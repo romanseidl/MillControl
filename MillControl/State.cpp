@@ -24,9 +24,6 @@ void State::stop() {
 void State::start() {
 }
 
-void State::draw() {
-}
-
 void State::loop() {
 }
 
@@ -36,12 +33,8 @@ void State::encoderChanged(int encoderPos) {
 void State::encoderClick() {
 }
 
-//--------------------------------------------------------------------------------
-// Titled State
-
-void TitledState::draw() {
-    State::draw();
-    UI::u8g.setFont(UI::FONT_SMALL);
+void State::draw() {
+    UI::u8g.setFont(UI::FONT_REGULAR);
 #ifdef PORTRAIT_DISPLAY
     UI::u8g.drawStr(0, 14, MillControl::TIME_MODE_SELECTOR.getMode().name);
 #else
@@ -49,11 +42,12 @@ void TitledState::draw() {
     UI::u8g.drawStr270(14, UI::DISPLAY_HEIGHT - 1, MillControl::TIME_MODE_SELECTOR.getMode().name);
 #endif
 
+#ifdef MEMORY_DISPLAY
     //Memory display
-/*    UI::u8g.setFont(u8g_font_u8glib_4);
+    UI::u8g.setFont(u8g_font_u8glib_4);
     char mem_str[5];
     const int mem = freeMemory();
     sprintf(mem_str, "%i", mem);
-    UI::u8g.drawStr(0, 24, mem_str);*/
+    UI::u8g.drawStr(0, 24, mem_str);
+#endif
 }
-

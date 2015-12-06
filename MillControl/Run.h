@@ -7,7 +7,7 @@
 
 
 
-class Run : public TitledState {
+class Run : public State {
 
     static const unsigned char RELAY_PIN = 10;
     static const unsigned char ON = LOW;
@@ -23,15 +23,17 @@ class Run : public TitledState {
     unsigned long stopTime;
     unsigned long updateTime;
     unsigned long pauseTime;
+    int runDeciSeconds;
+    int lastEncoderPos;
 
     TimeMode *timeMode;
 
     unsigned char runTime = 0;
 
-    void stopMill() const;
-
-    void startMill() const;
 public:
+    void stopMill() const;
+    void startMill() const;
+
     Run();
 
     void setMode(unsigned char);
@@ -42,6 +44,8 @@ public:
 
     virtual void millClick(unsigned char i) override;
 
+
+    virtual void encoderChanged(int encoderPos) override;
 
     virtual void encoderClick() override;
 

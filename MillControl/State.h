@@ -8,6 +8,7 @@ private:
     //the active mode - may be this or any sub-mode
 protected:
     void setEncoderMode(int, int);
+
 public:
     void redraw();
 
@@ -24,12 +25,7 @@ public:
 
     virtual void encoderChanged(int encoderPos);
 
-//Delegating loop function - false will exit a sub-mode (if there is one)
-virtual void loop();
+    //Delegating loop function - false will exit a sub-mode (if there is one)
+    virtual void loop();
 };
 
-
-class TitledState : public State {
-protected:
-    virtual void draw();
-};

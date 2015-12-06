@@ -10,6 +10,8 @@
 #include "TimeEditor.h"
 #include "CharEditor.h"
 #include "Run.h"
+#include "WeightCalibrationRun.h"
+#include "CalibrationPrompt.h"
 
 class MillControl{
     static State* state;
@@ -18,10 +20,12 @@ public:
     static const unsigned char DOUBLE_CLICK = 1;
     static const unsigned char LONG_CLICK = 2;
 
-    static TimeModeSelector TIME_MODE_SELECTOR;
-    static Editor           EDITOR;
-    static TimeEditor       TIME_EDITOR;
-    static CharEditor       CHAR_EDITOR;
+    static TimeModeSelector     TIME_MODE_SELECTOR;
+    static Editor               EDITOR;
+    static TimeEditor           TIME_EDITOR;
+    static CharEditor           CHAR_EDITOR;
+    static WeightCalibrationRun WEIGHT_CALIBRATOR;
+    static CalibrationPrompt    CALIBRATION_PROMPT;
 
     static Run              RUN;
     static void setup();
@@ -29,5 +33,6 @@ public:
     static void setState(State &_state);
 
     static void redraw();
+
 };
 

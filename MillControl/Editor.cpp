@@ -9,9 +9,16 @@ void Editor::start() {
     timeMode = &MillControl::TIME_MODE_SELECTOR.getMode();
     timeModes = &MillControl::TIME_MODE_SELECTOR.getTimeModes();
 
-    firstChar = TimeMode::TIMES_PER_MODE + 1;
+    firstChar = TimeMode::DATA_PER_MODE + (timeMode->weightMode ? 1 : 0);
 
     const int size = MillControl::TIME_MODE_SELECTOR.size();
+
+    back = firstChar++;
+
+    if (!deleteMode)
+        gram = firstChar++;
+    else
+        gram = 0;
 
     if (size < TimeModeList::MAX_MODES && !deleteMode)
         add = firstChar++;
@@ -32,11 +39,18 @@ void Editor::start() {
         right = 0;
     }
 
-    if(deleteMode)
+    if (deleteMode)
         setEncoderMode(2, 0);
     else
         setEncoderMode(firstChar + TimeMode::MAX_CHARS, position);
 
+    //if there is not mill button i need a multi click button in the gram editor
+#ifndef MILL_BUTTON
+    if(timeMode->weightMode)
+        UI::millButton.setMultiClickButton();
+    else
+        UI::millButton.setSingleClickButton();
+#endif
     redraw();
 }
 
@@ -44,7 +58,12 @@ void Editor::stop() {
 }
 
 int *Editor::getTime() {
-    return &timeMode->time[position];
+    if (timeMode->weightMode) if (position == 0)
+        return &timeMode->centiSecondsPerGram;
+    else
+        return &timeMode->data[position - 1];
+    else
+        return &timeMode->data[position];
 }
 
 char *Editor::getChar() {
@@ -53,10 +72,10 @@ char *Editor::getChar() {
 
 
 void Editor::encoderClick() {
-    if (position < TimeMode::TIMES_PER_MODE) {
+    if (position < back) {
         MillControl::setState(MillControl::TIME_EDITOR);
-    } else if (position == TimeMode::TIMES_PER_MODE) {
-        if(deleteMode) {
+    } else if (position == back) {
+        if (deleteMode) {
             deleteMode = false;
             start();
         } else {
@@ -64,20 +83,24 @@ void Editor::encoderClick() {
             MillControl::setState(MillControl::TIME_MODE_SELECTOR);
         }
         position = 0;
+    } else if (position == gram) {
+        timeMode->setWeightMode(!timeMode->weightMode);
+        position = 0;
+        start();
     } else if (position == add) {
         MillControl::TIME_MODE_SELECTOR.setMode(&timeModes->insertAfer(*timeMode));
         position = 0;
         start();
     } else if (position == left) {
         MillControl::TIME_MODE_SELECTOR.setMode(&timeModes->moveLeft(*timeMode));
-        position = TimeMode::TIMES_PER_MODE;
+        position = back;
         start();
     } else if (position == right) {
         MillControl::TIME_MODE_SELECTOR.setMode(&timeModes->moveRight(*timeMode));
-        position = TimeMode::TIMES_PER_MODE;
+        position = back;
         start();
     } else if (position == del) {
-        if(deleteMode){
+        if (deleteMode) {
             MillControl::TIME_MODE_SELECTOR.setMode(&timeModes->del(*timeMode));
             position = 0;
             deleteMode = false;
@@ -91,8 +114,19 @@ void Editor::encoderClick() {
     }
 }
 
+//In Weight Mode encoder click starts the calibration mode
+void Editor::millClick(unsigned char i) {
+    if(timeMode->weightMode)
+        MillControl::setState(MillControl::WEIGHT_CALIBRATOR);
+#ifndef MILL_BUTTON
+    else
+        encoderClick();
+#endif
+}
+
+
 void Editor::encoderChanged(int encoderPos) {
-    position = (deleteMode ? TimeMode::TIMES_PER_MODE : 0) + encoderPos;
+    position = (deleteMode ? back : 0) + encoderPos;
     redraw();
 }
 
@@ -106,60 +140,59 @@ void Editor::drawEditor() {
 }
 
 void Editor::draw(bool editor) {
-    TitledState::draw();
-
-    for (unsigned char t = 0; t < TimeMode::TIMES_PER_MODE; t++) {
-        const int time = timeMode->time[t];
-
+    State::draw();
+    unsigned char weightMode = timeMode->weightMode ? 1 : 0;
+    for (char t = -weightMode; t < TimeMode::DATA_PER_MODE; t++) {
+        const char pos = t + weightMode;
 #ifdef PORTRAIT_DISPLAY
         unsigned char x = 0;
-    #ifdef MILL_BUTTON
-        unsigned char y = 52 + t * 25;
-    #else
-        unsigned char y = 57 + t * 30;
-    #endif
+#ifdef MILL_BUTTON
+        const bool small = false;
+        unsigned char y = weightMode ? (39 + pos * 22) : (45 + pos * 28);
 #else
-        unsigned char x = 35;
-    #ifdef MILL_BUTTON
-        unsigned char y = 16 + t * 22;
-    #else
-        unsigned char y = 23 + t * 32;
-    #endif
+        const bool small = false;
+        unsigned char y = 45 + pos * 28;
 #endif
-
-        drawTimeLine(t, time, y, x);
-
-        if (position == t) {
-#if defined(MILL_BUTTON) && !defined(PORTRAIT_DISPLAY)
-            unsigned char d = 2;
 #else
-            unsigned char d = 4;
+        unsigned char x = 25;
+#ifdef MILL_BUTTON
+        const bool small = weightMode;
+        unsigned char y = small ? (13 + pos * 16) : (16 + t * 22);
+#else
+        const bool small = false;
+        unsigned char y = weightMode ? (15 + pos * 22) : (23 + pos * 32);
 #endif
-            if (editor)
-                UI::u8g.drawHLine(x + 24, y + d, time == TimeMode::SPECIAL_TIME ? (t == 3 ? 31 : 40) : 28);
-            else
-                UI::u8g.drawHLine(x, y + d, 64);
+#endif
+        const int data = t == -1 ? timeMode->centiSecondsPerGram : timeMode->data[t];
+
+        drawTimeLine(t, data, y, x, weightMode, small, position == pos, editor);
+
+        if (position == pos) {
+
         }
     }
 
     UI::u8g.setFont(UI::FONT_SMALL);
 
-    drawEditPoint(0, SYMBOL_BACK, TimeMode::TIMES_PER_MODE);
+    drawEditPoint(0, SYMBOL_BACK, back);
+
+    if (gram)
+        drawEditPoint(1, weightMode ? "s" : "g", gram);
 
     if (add)
-        drawEditPoint(1, ADD_STRING, add);
+        drawEditPoint(2, ADD_STRING, add);
 
     if (del)
-        drawEditPoint(2, DEL_STRING, del);
+        drawEditPoint(3, DEL_STRING, del);
 
     if (left)
-        drawEditPoint(3, MOVE_LEFT_STRING, left);
+        drawEditPoint(4, MOVE_LEFT_STRING, left);
 
     if (right)
-        drawEditPoint(4, MOVE_RIGHT_STRING, right);
+        drawEditPoint(5, MOVE_RIGHT_STRING, right);
 
     if (position >= firstChar) {
-
+        UI::u8g.setFont(UI::FONT_REGULAR);
         char charBuf[TimeMode::MAX_CHARS + 1];
 
         const int i = position - firstChar;
@@ -185,18 +218,18 @@ void Editor::draw(bool editor) {
 
 void Editor::drawEditPoint(unsigned char p, const char *symbol, const unsigned char pos) {
     unsigned char w = UI::u8g.getStrWidth(symbol);
-
+//    UI::u8g.setFont(UI::FONT_SMALL);
 #ifdef PORTRAIT_DISPLAY
-    const int x = p > 0 ? p * 12 + 5 : 0;
-    const int y = UI::DISPLAY_HEIGHT - 1;
+    const int x = p > 0 ? p * 11 + 0 : 0;
+    const int y = UI::DISPLAY_HEIGHT - 4;
 #else
-    const int x = UI::DISPLAY_WIDTH - 14;
-    const int y = p * 13 + 10;
+    const int x = UI::DISPLAY_WIDTH - (p == 0 ? 29 : 14);
+    const int y = p > 1 ? p * 13 - 3: 10;
 #endif
 
     UI::u8g.drawStr(x, y, symbol);
     if (pos == position) {
-        UI::u8g.drawHLine(x, y, w);
+        UI::u8g.drawHLine(x, y + 2, w);
     }
 };
 

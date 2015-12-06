@@ -7,12 +7,13 @@
 class UI {
 public:
     static const u8g_fntpgm_uint8_t* FONT_SMALL;
+    static const u8g_fntpgm_uint8_t* FONT_NUMERIC;
     static const u8g_fntpgm_uint8_t* FONT_REGULAR;
-    static const u8g_fntpgm_uint8_t* FONT_BOLD;
-    static const u8g_fntpgm_uint8_t* FONT_LARGE;
+    static const u8g_fntpgm_uint8_t* FONT_LARGE_NUMERIC;
 
     static Button encoderButton;
     static Button millButton;
+    static Button millButton2;
     static RotatingEncoder encoder;
 
     static const unsigned char DISPLAY_WIDTH;
@@ -29,5 +30,12 @@ public:
 //Comment out this line if there is no mill button
 #define MILL_BUTTON
 
+//Comment out this line if there is no second mill button
+//#define MILL_BUTTON_2
+
 //uncomment this to make the display lanscape
 #define PORTRAIT_DISPLAY
+
+
+//Debugging only - will display a free memory info
+//#define MEMORY_DISPLAY

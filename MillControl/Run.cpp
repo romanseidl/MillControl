@@ -23,9 +23,7 @@ void Run::loop() {
 
 void Run::stop() {
     stopMill();
-#ifdef MILL_BUTTON
     UI::millButton.setMultiClickButton();
-#endif
 }
 
 void Run::startMill() const { digitalWrite(RELAY_PIN, ON); }
@@ -36,9 +34,9 @@ void Run::start() {
     timeMode = &MillControl::TIME_MODE_SELECTOR.getMode();
     pauseTime = 0;
 
-    int time = timeMode->time[runTime];
-    if (time > 0) {
-        if (time == TimeMode::SPECIAL_TIME) {
+    runDeciSeconds = timeMode->getDeciSeconds(runTime);
+    if (runDeciSeconds > 0) {
+        if (runDeciSeconds == TimeMode::SPECIAL_DATA) {
             if (runTime == 2)
                 runType = HOLD_RUN;
             else
@@ -46,12 +44,12 @@ void Run::start() {
 
             stopTime = millis();
         } else {
-            stopTime = millis() + (long) time * 1000l;
+            lastEncoderPos = runDeciSeconds / 10;
+            setEncoderMode(30000, lastEncoderPos);
+            stopTime = millis() + (long) runDeciSeconds * 100l;
             runType = TIMED_RUN;
         }
-#ifdef MILL_BUTTON
         UI::millButton.setSingleClickButton();
-#endif
         startMill();
         redraw();
     } else
@@ -80,9 +78,9 @@ void Run::encoderClick() {
 }
 
 void Run::draw() {
-    TitledState::draw();
+    State::draw();
 
-    char c_t[4] = "";
+    char c_t[5] = "";
 #ifdef PORTRAIT_DISPLAY
     int x = 14;
     int y = 62;
@@ -98,17 +96,17 @@ void Run::draw() {
 
     switch (runTime) {
         case 0:
-            UI::u8g.setFont(UI::FONT_LARGE);
+            UI::u8g.setFont(UI::FONT_LARGE_NUMERIC);
             UI::u8g.drawStr(x, y, "1");
             break;
         case 1:
-            UI::u8g.setFont(UI::FONT_LARGE);
+            UI::u8g.setFont(UI::FONT_LARGE_NUMERIC);
             UI::u8g.drawStr(x + 1, y, "2");
             break;
         case 2:
-            UI::u8g.setFont(UI::FONT_BOLD);
+            UI::u8g.setFont(UI::FONT_REGULAR);
             UI::u8g.drawStr(x + 3, y - 5, UI::SYMBOL_LONG);
-            UI::u8g.setFont(UI::FONT_LARGE);
+            UI::u8g.setFont(UI::FONT_LARGE_NUMERIC);
             break;
     }
 
@@ -116,13 +114,13 @@ void Run::draw() {
 
     long remainingMillis = pauseTime ? pauseTime : stopTime - millis();
 
-    int remaining_sec = abs(remainingMillis / 1000) + 1;
+    int remainingSeconds = abs(remainingMillis / 1000) + 1;
 
-    if (remaining_sec < 0)
-        remaining_sec = 0;
+    if (remainingSeconds < 0)
+        remainingSeconds = 0;
 
     if (pauseTime) {
-        UI::u8g.setFont(UI::FONT_BOLD);
+        UI::u8g.setFont(UI::FONT_REGULAR);
     }
 
 #ifdef PORTRAIT_DISPLAY
@@ -134,10 +132,10 @@ void Run::draw() {
 #endif
 
     if (!pauseTime|| (millis() / 500) % 2) {
-        sprintf(c_t, "%i", remaining_sec);
+        sprintf(c_t, "%i", remainingSeconds);
         UI::u8g.drawStr(x - UI::u8g.getStrWidth(c_t), y, c_t);
     }
-    UI::u8g.setFont(UI::FONT_BOLD);
+    UI::u8g.setFont(UI::FONT_REGULAR);
     UI::u8g.drawStr(x, y, "s");
 
 
@@ -145,14 +143,22 @@ void Run::draw() {
 #ifdef PORTRAIT_DISPLAY
         unsigned char w =
                 UI::DISPLAY_WIDTH *
-                (1.0 - double(remainingMillis) / double(1000l * (long) timeMode->time[runTime]));
+                (1.0 - double(remainingMillis) / double(100l * (long) runDeciSeconds));
         UI::u8g.drawBox(0, UI::DISPLAY_HEIGHT - 3, w, 2);
 #else
-        unsigned char w = (UI::DISPLAY_WIDTH - 31) * ( 1.0 - double(remainingMillis)/double(1000l * (long) timeMode->time[runTime]));
+        unsigned char w = (UI::DISPLAY_WIDTH - 31) * ( 1.0 - double(remainingMillis)/double(100l * (long) runDeciSeconds));
         UI::u8g.drawBox(31, UI::DISPLAY_HEIGHT - 4, w, 3);
 #endif
     }
 }
 
 
-
+void Run::encoderChanged(int encoderPos) {
+    if(!pauseTime && runType == TIMED_RUN){
+        const int encoderDiff = encoderPos - lastEncoderPos;
+        stopTime += encoderDiff * 1000l;
+        runDeciSeconds += encoderDiff * 10;
+        lastEncoderPos = encoderPos;
+    }
+    lastEncoderPos = encoderPos;
+}

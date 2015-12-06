@@ -5,7 +5,7 @@
 #include "TimeMode.h"
 
 
-class TimeModeSelector : public TitledState, public TimeLine {
+class TimeModeSelector : public State, public TimeLine {
     int selectedMode;
     TimeModeList timeModes;
 public:

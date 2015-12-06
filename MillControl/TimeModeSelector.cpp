@@ -16,9 +16,11 @@ TimeModeSelector::TimeModeSelector() {
 }
 
 void TimeModeSelector::start() {
+    //If there is only one button ensure it is multi-click
 #ifndef MILL_BUTTON
     UI::millButton.setMultiClickButton();
 #endif
+
     setEncoderMode(timeModes.size(), selectedMode);
     redraw();
 }
@@ -54,19 +56,20 @@ void TimeModeSelector::setEncoderPos(int encoderPos) {
 }
 
 void TimeModeSelector::draw() {
-    TitledState::draw();
+    State::draw();
     UI::u8g.setFont(UI::FONT_SMALL);
 
 #ifndef PORTRAIT_DISPLAY
     unsigned char lines = 0;
-    for (unsigned char t = 0; t < TimeMode::TIMES_PER_MODE; t++)
-        if(timeModes.get(selectedMode).time[t] > 0)
+    for (unsigned char t = 0; t < TimeMode::DATA_PER_MODE; t++)
+        if(timeModes.get(selectedMode).data[t] > 0)
             lines++;
 #endif
 
     unsigned char line = 0;
-    for (unsigned char t = 0; t < TimeMode::TIMES_PER_MODE; t++) {
-        int time = timeModes.get(selectedMode).time[t];
+    for (unsigned char t = 0; t < TimeMode::DATA_PER_MODE; t++) {
+        const TimeMode &mode = timeModes.get(selectedMode);
+        int time = mode.data[t];
         if (time > 0) {
 #ifdef PORTRAIT_DISPLAY
             unsigned char x = 0;
@@ -75,7 +78,7 @@ void TimeModeSelector::draw() {
             unsigned char x = 43;
             unsigned char y = lines > 2 ? 16 + line * 22 : 23 + line * 32;
 #endif
-            drawTimeLine(t, time, y, x);
+            drawTimeLine(t, time, y, x, mode.weightMode, false, false, false);
             line++;
         }
     }
@@ -96,7 +99,4 @@ void TimeModeSelector::eepromWrite() {
 }
 
 void TimeModeSelector::stop() {
-#ifndef MILL_BUTTON
-    UI::millButton.setSingleClickButton();
-#endif
 }
