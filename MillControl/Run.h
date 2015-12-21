@@ -4,10 +4,11 @@
 
 #include "State.h"
 #include "TimeMode.h"
+#include "TimeLine.h"
 
 
 
-class Run : public State {
+class Run : public State, public TimeLine {
 
     static const unsigned char RELAY_PIN = 7;
     static const unsigned char ON = LOW;

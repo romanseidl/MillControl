@@ -88,35 +88,60 @@ const int UI::PAUSE_TIME = 5;
 //These are sensible defaults for Arduino Mini pro. If you use different Hardware and use Hardware SPI you might need to adapt them
 #define OLED_SCK 13  // also called: CLK, SCL
 #define OLED_MOSI 11 // also called: SDA, SID
-#define OLED_MISO 9  // also called: a0, D/C,  DC, RS
+#define OLED_MISO 9  // also called: a0, D/C,  DC, RS, Din
 #define OLED_RESET 8 // also called: RES, RST
-#define OLED_CS 10   // also called: SS, ST
+#define OLED_CS 10   // also called: SS, ST, CE
 
 //Software SPI
 //U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64_2X(OLED_SCK, OLED_MOSI, OLED_CS, OLED_MISO, OLED_RESET);
 
 //Hardware SPI
-U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64_2X(OLED_CS, OLED_MISO, OLED_RESET);
+//U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64_2X(OLED_CS, OLED_MISO, OLED_RESET);
 
+U8GLIB UI::u8g = U8GLIB_PCD8544(OLED_SCK, OLED_MOSI, OLED_CS, OLED_MISO, OLED_RESET);
 
-#ifdef PORTRAIT_DISPLAY
-    const unsigned char UI::DISPLAY_WIDTH = 64;
-    const unsigned char UI::DISPLAY_HEIGHT = 128;
+#ifdef DISPLAY_128x64
+  #ifdef PORTRAIT_DISPLAY
+      const unsigned char UI::DISPLAY_WIDTH = 64;
+      const unsigned char UI::DISPLAY_HEIGHT = 128;
+  #else
+      const unsigned char UI::DISPLAY_WIDTH = 128;
+      const unsigned char UI::DISPLAY_HEIGHT = 64;
+  #endif
+  const u8g_fntpgm_uint8_t* UI::FONT_SMALL{u8g_font_helvB10r};
+  const u8g_fntpgm_uint8_t* UI::FONT_NUMERIC{u8g_font_helvR14n};
+  const u8g_fntpgm_uint8_t* UI::FONT_REGULAR{u8g_font_helvB14r};
+  const u8g_fntpgm_uint8_t* UI::FONT_LARGE_NUMERIC{u8g_font_fub20n};
+  const unsigned char UI::BORDER_WIDTH = 2;
+  
+  const unsigned char UI::LINE_HEIGHT = 14;
+  const unsigned char UI::SMALL_LINE_HEIGHT = 10;
+  const unsigned char UI::LARGE_LINE_HEIGHT = 20;
 #else
-    const unsigned char UI::DISPLAY_WIDTH = 128;
-    const unsigned char UI::DISPLAY_HEIGHT = 64;
+  #ifdef PORTRAIT_DISPLAY
+      const unsigned char UI::DISPLAY_WIDTH = 48;
+      const unsigned char UI::DISPLAY_HEIGHT = 84;
+  #else
+      const unsigned char UI::DISPLAY_WIDTH = 84;
+      const unsigned char UI::DISPLAY_HEIGHT = 48;
+  #endif
+  const u8g_fntpgm_uint8_t* UI::FONT_SMALL{u8g_font_6x12r};
+  const u8g_fntpgm_uint8_t* UI::FONT_NUMERIC{u8g_font_helvR08n};
+  const u8g_fntpgm_uint8_t* UI::FONT_REGULAR{u8g_font_helvB08r};
+  const u8g_fntpgm_uint8_t* UI::FONT_LARGE_NUMERIC{u8g_font_helvB14n};  
+  const unsigned char UI::LINE_HEIGHT = 8;
+  const unsigned char UI::SMALL_LINE_HEIGHT = 6;
+  const unsigned char UI::LARGE_LINE_HEIGHT = 14;
+  const unsigned char UI::BORDER_WIDTH = 1;
 #endif
+
+
 //=================================================
 // Fonts
 
-const u8g_fntpgm_uint8_t* UI::FONT_SMALL{u8g_font_helvB10};
-const u8g_fntpgm_uint8_t* UI::FONT_NUMERIC{u8g_font_helvR14n};
-//const u8g_fntpgm_uint8_t* UI::FONT_NUMERIC{u8g_font_helvB14};
-const u8g_fntpgm_uint8_t* UI::FONT_REGULAR{u8g_font_helvB14};
-const u8g_fntpgm_uint8_t* UI::FONT_LARGE_NUMERIC{u8g_font_fub20n};
 const char UI::SYMBOL_LONG[] = {187, 0};
 
-void setup(void) {
+void setup() {
 #ifdef PORTRAIT_DISPLAY
     //Rotate the screen
     UI::u8g.setRot90();

@@ -33,7 +33,8 @@ public:
     TimeMode* timeMode;
     TimeModeList* timeModes;
 
-    void drawEditPoint(unsigned char p, const char *symbol, const unsigned char pos);
+    void drawEditPoint(unsigned char p, const unsigned char pos, const char *symbol) const;
+    
     void draw(bool editor);
 public:
     void encoderClick();

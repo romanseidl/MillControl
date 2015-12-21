@@ -24,6 +24,7 @@ void Run::loop() {
 void Run::stop() {
     stopMill();
     UI::millButton.setMultiClickButton();
+    UI::u8g.begin(); //resetting display - might help if there is interferences with the mill switch
 }
 
 void Run::startMill() const { digitalWrite(RELAY_PIN, ON); }
@@ -35,25 +36,22 @@ void Run::start() {
     pauseTime = 0;
 
     runDeciSeconds = timeMode->getDeciSeconds(runTime);
-    if (runDeciSeconds > 0) {
-        if (runDeciSeconds == TimeMode::SPECIAL_DATA) {
-            if (runTime == 2)
-                runType = HOLD_RUN;
-            else
-                runType = STOP_RUN;
+    if (runDeciSeconds == TimeMode::SPECIAL_DATA) {
+        if (runTime == 2)
+            runType = HOLD_RUN;
+        else
+            runType = STOP_RUN;
 
-            stopTime = millis();
-        } else {
-            lastEncoderPos = runDeciSeconds / 10;
-            setEncoderMode(30000, lastEncoderPos);
-            stopTime = millis() + (long) runDeciSeconds * 100l;
-            runType = TIMED_RUN;
-        }
-        UI::millButton.setSingleClickButton();
-        startMill();
-        redraw();
-    } else
-        MillControl::setState(MillControl::TIME_MODE_SELECTOR);
+        stopTime = millis();
+    } else {
+        lastEncoderPos = runDeciSeconds / 10;
+        setEncoderMode(30000, lastEncoderPos);
+        stopTime = millis() + (long) runDeciSeconds * 100l;
+        runType = TIMED_RUN;
+    }
+    UI::millButton.setSingleClickButton();
+    startMill();
+    redraw();
 }
 
 //If this is a timed tun this will only stop
@@ -77,40 +75,22 @@ void Run::encoderClick() {
     millClick(MillControl::CLICK);
 }
 
+
+
 void Run::draw() {
     State::draw();
 
     char c_t[5] = "";
 #ifdef PORTRAIT_DISPLAY
-    int x = 14;
-    int y = 62;
+    int x = 0;
+    int y = UI::LINE_HEIGHT + (UI::DISPLAY_HEIGHT / 3) +  (UI::LARGE_LINE_HEIGHT / 2);
 #else
-    int x = 42;
-    int y = 29;
+    int x = UI::LINE_HEIGHT * 2 + (UI::LARGE_LINE_HEIGHT / 2) + UI::BORDER_WIDTH * 2; //42
+    int y = UI::LARGE_LINE_HEIGHT + UI::BORDER_WIDTH * 2 + UI::BORDER_WIDTH * 5; //29
 #endif
 
-    UI::u8g.setColorIndex(1);
-    UI::u8g.drawDisc(x + 8, y - 11, 17);
-
-    UI::u8g.setColorIndex(0);
-
-    switch (runTime) {
-        case 0:
-            UI::u8g.setFont(UI::FONT_LARGE_NUMERIC);
-            UI::u8g.drawStr(x, y, "1");
-            break;
-        case 1:
-            UI::u8g.setFont(UI::FONT_LARGE_NUMERIC);
-            UI::u8g.drawStr(x + 1, y, "2");
-            break;
-        case 2:
-            UI::u8g.setFont(UI::FONT_REGULAR);
-            UI::u8g.drawStr(x + 3, y - 5, UI::SYMBOL_LONG);
-            UI::u8g.setFont(UI::FONT_LARGE_NUMERIC);
-            break;
-    }
-
-    UI::u8g.setColorIndex(1);
+    UI::u8g.setFont(UI::FONT_LARGE_NUMERIC);
+    drawSymbol(x, y, runTime, UI::LARGE_LINE_HEIGHT, 4, 2);
 
     long remainingMillis = pauseTime ? pauseTime : stopTime - millis();
 
@@ -124,11 +104,11 @@ void Run::draw() {
     }
 
 #ifdef PORTRAIT_DISPLAY
-    x = 50;
-    y = UI::DISPLAY_HEIGHT - 24;
+    x = UI::DISPLAY_WIDTH - UI::LINE_HEIGHT;
+    y = UI::DISPLAY_HEIGHT - 12 * UI::BORDER_WIDTH;
 #else
-    x = 115;
-    y = 53;
+    x = UI::DISPLAY_WIDTH - UI::LINE_HEIGHT; //115;
+    y = UI::DISPLAY_HEIGHT - 6 * UI::BORDER_WIDTH; //53;
 #endif
 
     if (!pauseTime|| (millis() / 500) % 2) {
@@ -144,10 +124,10 @@ void Run::draw() {
         unsigned char w =
                 UI::DISPLAY_WIDTH *
                 (1.0 - double(remainingMillis) / double(100l * (long) runDeciSeconds));
-        UI::u8g.drawBox(0, UI::DISPLAY_HEIGHT - 3, w, 2);
+        UI::u8g.drawBox(0, UI::DISPLAY_HEIGHT - UI::BORDER_WIDTH * 2 - 1, w, UI::BORDER_WIDTH * 2);
 #else
-        unsigned char w = (UI::DISPLAY_WIDTH - 31) * ( 1.0 - double(remainingMillis)/double(100l * (long) runDeciSeconds));
-        UI::u8g.drawBox(31, UI::DISPLAY_HEIGHT - 4, w, 3);
+        unsigned char w = (UI::DISPLAY_WIDTH - UI::LINE_HEIGHT * 2) * ( 1.0 - double(remainingMillis)/double(100l * (long) runDeciSeconds));
+        UI::u8g.drawBox(UI::LINE_HEIGHT * 2, UI::DISPLAY_HEIGHT - UI::BORDER_WIDTH * 2 - 1, w, UI::BORDER_WIDTH * 2);
 #endif
     }
 }

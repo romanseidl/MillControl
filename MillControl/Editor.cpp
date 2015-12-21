@@ -143,53 +143,54 @@ void Editor::draw(bool editor) {
     State::draw();
     unsigned char weightMode = timeMode->weightMode ? 1 : 0;
     for (char t = -weightMode; t < TimeMode::DATA_PER_MODE; t++) {
+
         const char pos = t + weightMode;
+        
 #ifdef PORTRAIT_DISPLAY
         unsigned char x = 0;
 #ifdef MILL_BUTTON
         const bool small = false;
-        unsigned char y = weightMode ? (39 + pos * 22) : (45 + pos * 28);
+        unsigned char y = weightMode ? (UI::LINE_HEIGHT + UI::SMALL_LINE_HEIGHT + ((UI::DISPLAY_HEIGHT - UI::LINE_HEIGHT - (UI::SMALL_LINE_HEIGHT * 5)) * 2 / 10) + (((UI::DISPLAY_HEIGHT - UI::LINE_HEIGHT - (UI::SMALL_LINE_HEIGHT * 5)) * 2 / 10) + UI::SMALL_LINE_HEIGHT) * pos)
+                                     : (UI::LINE_HEIGHT * 2  + ((UI::DISPLAY_HEIGHT - UI::SMALL_LINE_HEIGHT - (UI::LINE_HEIGHT * 5)) * 3 / 8) + (((UI::DISPLAY_HEIGHT - (UI::LINE_HEIGHT * 5)) * 2 / 8) + UI::LINE_HEIGHT) * pos );   //52 + line*32#endif
 #else
         const bool small = false;
-        unsigned char y = 45 + pos * 28;
+        unsigned char y = UI::LINE_HEIGHT *2  + ((UI::DISPLAY_HEIGHT - (UI::LINE_HEIGHT * 5)) * 3 / 8) + (((UI::DISPLAY_HEIGHT - (UI::LINE_HEIGHT * 5)) * 2 / 8) + UI::LINE_HEIGHT) * pos;   //52 + line*32#endif
 #endif
 #else
-        unsigned char x = 25;
+        unsigned char x = UI::LINE_HEIGHT*2;
 #ifdef MILL_BUTTON
         const bool small = weightMode;
-        unsigned char y = small ? (13 + pos * 16) : (16 + t * 22);
+        const unsigned char y = weightMode ? (((UI::DISPLAY_HEIGHT- (UI::SMALL_LINE_HEIGHT * 4)) / 8) + UI::SMALL_LINE_HEIGHT  + (((UI::DISPLAY_HEIGHT- (UI::SMALL_LINE_HEIGHT  *4)) / 4) + UI::SMALL_LINE_HEIGHT  ) * pos) :
+                                             (((UI::DISPLAY_HEIGHT- (UI::LINE_HEIGHT * 3)) / 6) + UI::LINE_HEIGHT + (((UI::DISPLAY_HEIGHT- (UI::LINE_HEIGHT *3)) / 3) + UI::LINE_HEIGHT ) * pos); //small ? (13 + pos * 16) : (16 + t * 22);
 #else
         const bool small = false;
-        unsigned char y = weightMode ? (15 + pos * 22) : (23 + pos * 32);
+        const unsigned char y = weightMode ? (((UI::DISPLAY_HEIGHT - (UI::LINE_HEIGHT * 3)) / 6) + UI::LINE_HEIGHT + (((UI::DISPLAY_HEIGHT- (UI::LINE_HEIGHT *3)) / 3) + UI::LINE_HEIGHT ) * pos) :
+                                             (((UI::DISPLAY_HEIGHT - (UI::LINE_HEIGHT * 2)) / 4) + UI::LINE_HEIGHT + (((UI::DISPLAY_HEIGHT- (UI::LINE_HEIGHT *2)) / 2) + UI::LINE_HEIGHT ) * pos); // y = weightMode ? (15 + pos * 22) : (23 + pos * 32);
 #endif
 #endif
-        const int data = t == -1 ? timeMode->centiSecondsPerGram : timeMode->data[t];
+        const int data = (t == -1) ? timeMode->centiSecondsPerGram : timeMode->data[t];
 
         drawTimeLine(t, data, y, x, weightMode, small, position == pos, editor);
-
-        if (position == pos) {
-
-        }
     }
 
     UI::u8g.setFont(UI::FONT_SMALL);
-
-    drawEditPoint(0, SYMBOL_BACK, back);
+    
+    drawEditPoint(0, back, 0);
 
     if (gram)
-        drawEditPoint(1, weightMode ? "s" : "g", gram);
+        drawEditPoint(1, gram, weightMode ? "s" : "g");
 
     if (add)
-        drawEditPoint(2, ADD_STRING, add);
+        drawEditPoint(2, add, ADD_STRING);
 
     if (del)
-        drawEditPoint(3, DEL_STRING, del);
+        drawEditPoint(3, del, DEL_STRING);
 
     if (left)
-        drawEditPoint(4, MOVE_LEFT_STRING, left);
+        drawEditPoint(4, left, MOVE_LEFT_STRING);
 
     if (right)
-        drawEditPoint(5, MOVE_RIGHT_STRING, right);
+        drawEditPoint(5, right, MOVE_RIGHT_STRING);
 
     if (position >= firstChar) {
         UI::u8g.setFont(UI::FONT_REGULAR);
@@ -205,31 +206,36 @@ void Editor::draw(bool editor) {
         unsigned char x = UI::u8g.getStrWidth(charBuf);
 
 #ifdef PORTRAIT_DISPLAY
-        UI::u8g.drawHLine(x, 18, w);
+        UI::u8g.drawHLine(x, UI::LINE_HEIGHT + UI::BORDER_WIDTH, w);
         if (editor)
-            UI::u8g.drawHLine(x, 16, w);
+            UI::u8g.drawHLine(x, UI::LINE_HEIGHT + UI::BORDER_WIDTH + 2, w);
 #else
-        UI::u8g.drawVLine(18, UI::DISPLAY_HEIGHT - x - w, w);
+        UI::u8g.drawVLine(UI::LINE_HEIGHT + UI::BORDER_WIDTH, UI::DISPLAY_HEIGHT - x - w, w);
         if (editor)
-            UI::u8g.drawVLine(16, UI::DISPLAY_HEIGHT - x - w, w);
+            UI::u8g.drawVLine(UI::LINE_HEIGHT + UI::BORDER_WIDTH + 2, UI::DISPLAY_HEIGHT - x - w, w);
 #endif
     }
 }
 
-void Editor::drawEditPoint(unsigned char p, const char *symbol, const unsigned char pos) {
-    unsigned char w = UI::u8g.getStrWidth(symbol);
+void Editor::drawEditPoint(unsigned char p, const unsigned char pos, const char *symbol) const{
 //    UI::u8g.setFont(UI::FONT_SMALL);
 #ifdef PORTRAIT_DISPLAY
-    const int x = p > 0 ? p * 11 + 0 : 0;
-    const int y = UI::DISPLAY_HEIGHT - 4;
+    const int x = (UI::DISPLAY_WIDTH / 6) * p + (p > 0 ? ((UI::DISPLAY_WIDTH / 6) - UI::u8g.getStrWidth(MOVE_RIGHT_STRING)) : 0);
+    const int y = UI::DISPLAY_HEIGHT - 2 * UI::BORDER_WIDTH;
 #else
-    const int x = UI::DISPLAY_WIDTH - (p == 0 ? 29 : 14);
-    const int y = p > 1 ? p * 13 - 3: 10;
+    const int x = UI::DISPLAY_WIDTH - (p == 0 ? (2 * UI::SMALL_LINE_HEIGHT + UI::BORDER_WIDTH * 4) : 
+                                                    (UI::SMALL_LINE_HEIGHT + UI::BORDER_WIDTH * 2));
+    const int y = p > 1 ? ( p * (UI::SMALL_LINE_HEIGHT + 3) - 3 ) : UI::SMALL_LINE_HEIGHT;
 #endif
 
-    UI::u8g.drawStr(x, y, symbol);
+    if(symbol)
+      UI::u8g.drawStr(x, y, symbol);    
+    else
+      drawDirectionSymbol(x, y, UI::SMALL_LINE_HEIGHT, true);
+
     if (pos == position) {
-        UI::u8g.drawHLine(x, y + 2, w);
+      unsigned char w = symbol ? UI::u8g.getStrWidth(symbol) : UI::SMALL_LINE_HEIGHT;
+      UI::u8g.drawHLine(x, y + UI::BORDER_WIDTH, w);
     }
 };
 

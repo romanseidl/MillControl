@@ -26,8 +26,8 @@ public:
     static CharEditor           CHAR_EDITOR;
     static WeightCalibrationRun WEIGHT_CALIBRATOR;
     static CalibrationPrompt    CALIBRATION_PROMPT;
+    static Run                  RUN;
 
-    static Run              RUN;
     static void setup();
     static void loop();
     static void setState(State &_state);

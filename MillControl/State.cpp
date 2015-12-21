@@ -36,10 +36,10 @@ void State::encoderClick() {
 void State::draw() {
     UI::u8g.setFont(UI::FONT_REGULAR);
 #ifdef PORTRAIT_DISPLAY
-    UI::u8g.drawStr(0, 14, MillControl::TIME_MODE_SELECTOR.getMode().name);
+    UI::u8g.drawStr(0, UI::LINE_HEIGHT, MillControl::TIME_MODE_SELECTOR.getMode().name);  //0,14
 #else
  //   UI::u8g.drawStr90(14, 50, MillControl::TIME_MODE_SELECTOR.getMode().name);
-    UI::u8g.drawStr270(14, UI::DISPLAY_HEIGHT - 1, MillControl::TIME_MODE_SELECTOR.getMode().name);
+    UI::u8g.drawStr270(UI::LINE_HEIGHT, UI::DISPLAY_HEIGHT - 1, MillControl::TIME_MODE_SELECTOR.getMode().name);
 #endif
 
 #ifdef MEMORY_DISPLAY

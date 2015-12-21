@@ -32,15 +32,14 @@ void CalibrationPrompt::draw() {
         sprintf(c_t, "%i", deciGrams / 10);
 
 #ifdef PORTRAIT_DISPLAY
-    const char x=52;
-    const char y=124;
-    UI::u8g.setFont(UI::FONT_LARGE_NUMERIC);
+    const char x=UI::DISPLAY_WIDTH - UI::SMALL_LINE_HEIGHT - UI::LINE_HEIGHT - UI::BORDER_WIDTH;
+    const char y=UI::DISPLAY_HEIGHT - UI::BORDER_WIDTH - 1;
 #else
-    const char x = 100;
-    const char y = 55;
-    UI::u8g.setFont(UI::FONT_LARGE_NUMERIC);
+    const char x = UI::DISPLAY_WIDTH - UI::LINE_HEIGHT -1; //100
+    const char y = UI::DISPLAY_HEIGHT - 3 * UI::BORDER_WIDTH - 1;
 #endif
 
+    UI::u8g.setFont(UI::FONT_LARGE_NUMERIC);
     const char w = UI::u8g.getStrWidth(c_t);
     UI::u8g.drawStr(x - w, y, c_t);
 #ifdef PORTRAIT_DISPLAY
@@ -49,5 +48,5 @@ void CalibrationPrompt::draw() {
     UI::u8g.setFont(UI::FONT_REGULAR);
 #endif
     UI::u8g.drawStr(x, y, "g");
-    UI::u8g.drawHLine(x - w, y + 3, w);
+    UI::u8g.drawHLine(x - w, y + UI::BORDER_WIDTH, w);
 }

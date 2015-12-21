@@ -39,8 +39,10 @@ void TimeModeSelector::encoderClick() {
 }
 
 void TimeModeSelector::millClick(unsigned char clickType) {
-    MillControl::RUN.setMode(clickType);
-    MillControl::setState(MillControl::RUN);
+    if(getMode().getDeciSeconds(clickType)){
+      MillControl::RUN.setMode(clickType);
+      MillControl::setState(MillControl::RUN);
+    }
 }
 
 void TimeModeSelector::encoderChanged(int encoderPos) {
@@ -73,10 +75,11 @@ void TimeModeSelector::draw() {
         if (time > 0) {
 #ifdef PORTRAIT_DISPLAY
             unsigned char x = 0;
-            unsigned char y = 52 + line * 32;
+            unsigned char y = UI::LINE_HEIGHT *2  + ((UI::DISPLAY_HEIGHT - (UI::LINE_HEIGHT * 4)) * 3 / 8) + (((UI::DISPLAY_HEIGHT - (UI::LINE_HEIGHT * 4)) * 2 / 8) + UI::LINE_HEIGHT) * line;   //52 + line*32
 #else
-            unsigned char x = 43;
-            unsigned char y = lines > 2 ? 16 + line * 22 : 23 + line * 32;
+            unsigned char x = (UI::DISPLAY_WIDTH - UI::DISPLAY_HEIGHT - UI::LINE_HEIGHT) / 2 + UI::LINE_HEIGHT;
+            unsigned char y = lines > 2 ? ((UI::DISPLAY_HEIGHT- (UI::LINE_HEIGHT * 3)) / 6) + UI::LINE_HEIGHT + (((UI::DISPLAY_HEIGHT- (UI::LINE_HEIGHT *3)) / 3) + UI::LINE_HEIGHT ) * line :
+                                          ((UI::DISPLAY_HEIGHT- (UI::LINE_HEIGHT * 2)) / 4) + UI::LINE_HEIGHT + (((UI::DISPLAY_HEIGHT- (UI::LINE_HEIGHT *2)) / 2) + UI::LINE_HEIGHT ) * line; //lines > 2 ? 16 + line * 22 : 23 + line * 32;  //16 + line * 22 : 23 + line * 32  - 
 #endif
             drawTimeLine(t, time, y, x, mode.weightMode, false, false, false);
             line++;

@@ -8,14 +8,15 @@
 void CalibrationRun::draw() {
     State::draw();
 #ifdef PORTRAIT_DISPLAY
-    const char x = 63;
-    const char y = 99;
     UI::u8g.setFont(UI::FONT_SMALL);
-    UI::u8g.drawStr270(x, y, "Calibration");
+    const char* text = "Calibration";
+    const char x = UI::DISPLAY_WIDTH -1;
+    const char y = UI::DISPLAY_HEIGHT - UI::BORDER_WIDTH - 1;
+    UI::u8g.drawStr270(x, y, text);
 #else
     char x = 25;
     char y = 18;
     UI::u8g.setFont(UI::FONT_REGULAR);
-    UI::u8g.drawStr(25, 18, "Calibration");
+    UI::u8g.drawStr(UI::LINE_HEIGHT * 2, UI::LINE_HEIGHT, "Calibration"); //25,18
 #endif
 }

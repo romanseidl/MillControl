@@ -43,11 +43,11 @@ void WeightCalibrationRun::draw() {
     CalibrationRun::draw();
 
 #ifdef PORTRAIT_DISPLAY
-    const char x=52;
-    const char y=127;
+    const char x=UI::DISPLAY_WIDTH - UI::SMALL_LINE_HEIGHT - UI::LINE_HEIGHT - UI::BORDER_WIDTH;
+    const char y=UI::DISPLAY_HEIGHT - UI::BORDER_WIDTH - 1;
 #else
-    const char x = 89;
-    const char y = 57;
+    const char x = UI::DISPLAY_WIDTH - UI::LINE_HEIGHT - 1; //89
+    const char y = UI::DISPLAY_HEIGHT - 3 * UI::BORDER_WIDTH - 1;//57;
 #endif
 
     char c_t[6] = "";
