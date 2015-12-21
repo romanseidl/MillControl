@@ -47,9 +47,9 @@ void Editor::start() {
     //if there is not mill button i need a multi click button in the gram editor
 #ifndef MILL_BUTTON
     if(timeMode->weightMode)
-        UI::millButton.setMultiClickButton();
+        UI::encoderButton.setMultiClickButton();
     else
-        UI::millButton.setSingleClickButton();
+        UI::encoderButton.setSingleClickButton();
 #endif
     redraw();
 }
@@ -170,7 +170,7 @@ void Editor::draw(bool editor) {
 #endif
         const int data = (t == -1) ? timeMode->centiSecondsPerGram : timeMode->data[t];
 
-        drawTimeLine(t, data, y, x, weightMode, small, position == pos, editor);
+        UI::drawTimeLine(t, data, y, x, weightMode, small, position == pos, editor);
     }
 
     UI::u8g.setFont(UI::FONT_SMALL);
@@ -231,7 +231,7 @@ void Editor::drawEditPoint(unsigned char p, const unsigned char pos, const char 
     if(symbol)
       UI::u8g.drawStr(x, y, symbol);    
     else
-      drawDirectionSymbol(x, y, UI::SMALL_LINE_HEIGHT, true);
+      UI::drawDirectionSymbol(x+ UI::SMALL_LINE_HEIGHT / 2 - UI::BORDER_WIDTH, y, UI::SMALL_LINE_HEIGHT, true);
 
     if (pos == position) {
       unsigned char w = symbol ? UI::u8g.getStrWidth(symbol) : UI::SMALL_LINE_HEIGHT;

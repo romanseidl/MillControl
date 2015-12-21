@@ -3,15 +3,18 @@
  * App Class
  * Here everything is static.
  */
-
 #include "State.h"
 #include "TimeModeSelector.h"
 #include "Editor.h"
 #include "TimeEditor.h"
 #include "CharEditor.h"
 #include "Run.h"
-#include "WeightCalibrationRun.h"
+#include "CalibrationRun.h"
 #include "CalibrationPrompt.h"
+
+#ifdef BREW_BUTTON
+    #include "BrewTimer.h"
+#endif
 
 class MillControl{
     static State* state;
@@ -24,13 +27,18 @@ public:
     static Editor               EDITOR;
     static TimeEditor           TIME_EDITOR;
     static CharEditor           CHAR_EDITOR;
-    static WeightCalibrationRun WEIGHT_CALIBRATOR;
+    static CalibrationRun WEIGHT_CALIBRATOR;
     static CalibrationPrompt    CALIBRATION_PROMPT;
     static Run                  RUN;
+
+#ifdef BREW_BUTTON
+    static BrewTimer            BREW_TIMER;
+#endif
 
     static void setup();
     static void loop();
     static void setState(State &_state);
+    static State* getState();
 
     static void redraw();
 

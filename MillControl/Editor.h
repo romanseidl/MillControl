@@ -1,14 +1,13 @@
 #pragma once
 
 #include "TimeMode.h"
-#include "TimeLine.h"
 #include "State.h"
 
 static constexpr char SYMBOL_BACK[2] = {171, 0};
 
 class TimeModeSelector;
 
-class Editor : public State, public TimeLine {
+class Editor : public State {
     static const char DEL_STRING[2];
     static const char ADD_STRING[2];
     static const char MOVE_LEFT_STRING[2];

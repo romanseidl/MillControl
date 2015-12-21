@@ -2,15 +2,18 @@
 // Created by roman on 26.11.15.
 //
 #include "MillControl.h"
-#include "CalibrationPrompt.h"
 
 TimeModeSelector        MillControl::TIME_MODE_SELECTOR;
 Editor                  MillControl::EDITOR;
 TimeEditor              MillControl::TIME_EDITOR;
 CharEditor              MillControl::CHAR_EDITOR;
 Run                     MillControl::RUN;
-WeightCalibrationRun    MillControl::WEIGHT_CALIBRATOR;
+CalibrationRun    MillControl::WEIGHT_CALIBRATOR;
 CalibrationPrompt       MillControl::CALIBRATION_PROMPT;
+
+#ifdef BREW_BUTTON
+    BrewTimer               MillControl::BREW_TIMER;
+#endif
 
 State *MillControl::state = &TIME_MODE_SELECTOR;
 
@@ -26,20 +29,29 @@ void MillControl::setState(State &_state) {
 
 //Handle user input
 void MillControl::loop() {
+
+#ifdef BREW_BUTTON
+    const char brewClicks = UI::brewButton.getClicks();
+#endif
+
+#ifdef MILL_BUTTON
     const char millClicks = UI::millButton.getClicks();
-#ifdef MILL_BUTTON_2
-    const char mill2Clicks = UI::millButton2.getClicks();
+    #ifdef MILL_BUTTON_2
+        const char mill2Clicks = UI::millButton2.getClicks();
+    #endif
+#else
+    const char millClicks = UI::encoderButton.getClicks();
 #endif
 
     if (millClicks != 0) {
 #ifdef MILL_BUTTON
         state->millClick(millClicks > 0 ? (millClicks == 1 ? CLICK : DOUBLE_CLICK) : LONG_CLICK);
     }
-#ifdef MILL_BUTTON_2
+    #ifdef MILL_BUTTON_2
     else if (mill2Clicks != 0) {
-        state->millClick(mill2Clicks > 0 ? DOUBLE_CLICK : LONG_CLICK);
+            state->millClick(mill2Clicks > 0 ? DOUBLE_CLICK : LONG_CLICK);
     }
-#endif
+    #endif
     else if (UI::encoderButton.getClicks() != 0) {
         state->encoderClick();
     }
@@ -59,6 +71,15 @@ void MillControl::loop() {
         }
     }
 #endif
+#ifdef BREW_BUTTON
+    // Only the long click is used
+    else if (brewClicks < 0) {
+#ifdef DEBUG
+        Serial.println("brewClick");
+#endif
+        state->brewClick();
+    }
+#endif
     else if (UI::encoder.updated()) {
         state->encoderChanged(UI::encoder.getPosition());
     } else
@@ -66,4 +87,6 @@ void MillControl::loop() {
 }
 
 
-
+State *MillControl::getState() {
+    return state;
+}

@@ -4,13 +4,9 @@
 
 #include "State.h"
 #include "TimeMode.h"
-#include "TimeLine.h"
 
+class Run : public State {
 
-
-class Run : public State, public TimeLine {
-
-    static const unsigned char RELAY_PIN = 7;
     static const unsigned char ON = LOW;
     static const unsigned char OFF = HIGH;
 
@@ -45,10 +41,13 @@ public:
 
     virtual void millClick(unsigned char i) override;
 
-
     virtual void encoderChanged(int encoderPos) override;
 
     virtual void encoderClick() override;
+
+#ifdef BREW_BUTTON
+    virtual void brewClick() override;
+#endif
 
 protected:
     virtual void loop() override;

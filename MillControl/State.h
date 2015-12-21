@@ -25,7 +25,12 @@ public:
 
     virtual void encoderChanged(int encoderPos);
 
+#ifdef BREW_BUTTON
+    virtual void brewClick();
+#endif
+
     //Delegating loop function - false will exit a sub-mode (if there is one)
     virtual void loop();
+
 };
 

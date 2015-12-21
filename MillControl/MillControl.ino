@@ -33,72 +33,65 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
  */
 
+#include "State.h"
 #include "MillControl.h"
 
 //=================================================
-// Encoder - has two pins
-// only change pins if necessary, 2&3 have hardware interrupts and are thus faster!
-
-//Pins - change as you like
-#define ENCODER_BUTTON_PIN 4
-#define MILL_BUTTON_PIN 5
-#define MILL_BUTTON2_PIN 6
-
-//The relay Pin is seht in Run.h
-
-//If you don't have a mill button go to UI.h and comment out the define!
-
-//This will change the button settings - do not change
-#ifdef MILL_BUTTON
-    #ifdef MILL_BUTTON_2
-        Button UI::millButton(MILL_BUTTON_PIN, Button::MULTI_CLICK);
-        Button UI::millButton2(MILL_BUTTON2_PIN, Button::MULTI_CLICK);
-        Button UI::encoderButton(ENCODER_BUTTON_PIN, Button::SINGLE_CLICK);
-    #else
-        Button UI::millButton(MILL_BUTTON_PIN, Button::MULTI_CLICK);
-        Button UI::millButton2 = UI::millButton;
-        Button UI::encoderButton(ENCODER_BUTTON_PIN, Button::SINGLE_CLICK);
-    #endif
-#else
-    Button UI::millButton(ENCODER_BUTTON_PIN, Button::MULTI_CLICK);
-    Button UI::millButton2 = UI::millButton;
-    Button UI::encoderButton = UI::millButton;
-#endif
-
-//=================================================
-// Encoder - has two pins
+// ENCODER - has two pins
 // only change pins if necessary, 2&3 have hardware interrupts and are thus faster!
 
 RotatingEncoder UI::encoder(2, 3);
+#define ENCODER_BUTTON 4
+
+//=================================================
+// BUTTONS
+
+//Buttons are in UI.h
 
 //=================================================
 // Pause time
 // when stopping a timedrun by pressing the button the mill will wait for
 // the given amount of seconds to allow for a restart
-const int UI::PAUSE_TIME = 5;
+const unsigned char UI::PAUSE_TIME = 5;
 
 //=================================================
 // Display
-// You can either connect a SPI or a I2C display. SPI is mcuh faster but may be a bit annoying to find th right pinout
 
-// i2c
-//U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64_2X(U8G_I2C_OPT_NO_ACK);
+// Orientation of the display can be changed in UI.h
 
-//SPI
-//These are sensible defaults for Arduino Mini pro. If you use different Hardware and use Hardware SPI you might need to adapt them
-#define OLED_SCK 13  // also called: CLK, SCL
-#define OLED_MOSI 11 // also called: SDA, SID
-#define OLED_MISO 9  // also called: a0, D/C,  DC, RS, Din
+// SPI - Bus (only applies if you use a SPI Display
+// These are sensible defaults for Arduino Mini pro. If you use different Hardware and use Hardware SPI you might need to adapt them
+// Somehow HArdware SPI with MISO on pin 12 was not working even though this is the default according to the arduino.cc.
+// SPI is hell because there is only a very weak norm on how the connectors are called. Producers seem keep inventing new names...
 #define OLED_RESET 8 // also called: RES, RST
 #define OLED_CS 10   // also called: SS, ST, CE
+#define OLED_MOSI 11 // also called: SDA, SID, Din
+#define OLED_MISO 9  // also called: a0, D/C,  DC, RS
+#define OLED_SCK 13  // also called: CLK, SCL
 
-//Software SPI
+
+//=================================================
+// SSD 1306 Display
+
+// Uncomment this if you are using the SSD1306
+#define DISPLAY_128x64
+
+// You can either connect a SPI or a I2C display. SPI is much faster but may be a bit annoying to find th right pinout
+
+// i2c
+// U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64_2X(U8G_I2C_OPT_NO_ACK);
+
+// Software SPI
 //U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64_2X(OLED_SCK, OLED_MOSI, OLED_CS, OLED_MISO, OLED_RESET);
 
-//Hardware SPI
-//U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64_2X(OLED_CS, OLED_MISO, OLED_RESET);
+// Hardware SPI (recommended, if not working try software spi)
+U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64_2X(OLED_CS, OLED_MISO, OLED_RESET);
 
-U8GLIB UI::u8g = U8GLIB_PCD8544(OLED_SCK, OLED_MOSI, OLED_CS, OLED_MISO, OLED_RESET);
+//=================================================
+// PCD 8544 Display
+
+// Uncomment this if you are using the PCD 8544
+//U8GLIB UI::u8g = U8GLIB_PCD8544(OLED_SCK, OLED_MOSI, OLED_CS, OLED_MISO, OLED_RESET);
 
 #ifdef DISPLAY_128x64
   #ifdef PORTRAIT_DISPLAY
@@ -135,11 +128,18 @@ U8GLIB UI::u8g = U8GLIB_PCD8544(OLED_SCK, OLED_MOSI, OLED_CS, OLED_MISO, OLED_RE
   const unsigned char UI::BORDER_WIDTH = 1;
 #endif
 
+//This will change the button settings - do not change
+Button UI::encoderButton(ENCODER_BUTTON, Button::SINGLE_CLICK);
+#ifdef MILL_BUTTON
+    Button UI::millButton(MILL_BUTTON, Button::MULTI_CLICK);
+    #ifdef MILL_BUTTON_2
+        Button UI::millButton2(MILL_BUTTON_2, Button::MULTI_CLICK);
+    #endif
+#endif
 
-//=================================================
-// Fonts
-
-const char UI::SYMBOL_LONG[] = {187, 0};
+#ifdef BREW_BUTTON
+    Button UI::brewButton(BREW_BUTTON, Button::SINGLE_CLICK);
+#endif
 
 void setup() {
 #ifdef PORTRAIT_DISPLAY
@@ -147,8 +147,14 @@ void setup() {
     UI::u8g.setRot90();
 #endif
     MillControl::setup();
+#ifdef DEBUG
+    Serial.begin(9600);
+    Serial.println("Setup");
+#endif
 }
 
 void loop() {
+    Serial.print(".");
     MillControl::loop();
 }
+

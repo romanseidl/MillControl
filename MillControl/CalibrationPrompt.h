@@ -3,9 +3,9 @@
 // Created by roman on 03.12.15.
 //
 
-#include "CalibrationRun.h"
+#include "State.h"
 
-class CalibrationPrompt : public CalibrationRun {
+class CalibrationPrompt : public State {
     int deciGrams = 70;
 public:
     virtual void start() override;

@@ -4,8 +4,8 @@
 #include "MillControl.h"
 
 Run::Run() {
-    pinMode(RELAY_PIN, OUTPUT);
-    digitalWrite(RELAY_PIN, OFF);
+    pinMode(UI::RELAY_PIN, OUTPUT);
+    digitalWrite(UI::RELAY_PIN, OFF);
 }
 
 void Run::setMode(unsigned char mode) {
@@ -13,7 +13,13 @@ void Run::setMode(unsigned char mode) {
 }
 
 void Run::loop() {
-    if ((runType == TIMED_RUN && millis() > stopTime) || (runType == HOLD_RUN && UI::millButton.depressed())) {
+    if ((runType == TIMED_RUN && millis() > stopTime)
+//Hold Run only exists if there is a mill button
+#ifdef MILL_BUTTON
+            || (runType == HOLD_RUN && UI::millButton.depressed())
+#endif
+        )
+    {
         MillControl::setState(MillControl::TIME_MODE_SELECTOR);
     } else if (millis() > (updateTime + 250)) {
         updateTime = millis();
@@ -23,13 +29,17 @@ void Run::loop() {
 
 void Run::stop() {
     stopMill();
+#ifdef MILL_BUTTON
     UI::millButton.setMultiClickButton();
+#else
+    UI::encoderButton.setMultiClickButton();
+#endif
     UI::u8g.begin(); //resetting display - might help if there is interferences with the mill switch
 }
 
-void Run::startMill() const { digitalWrite(RELAY_PIN, ON); }
+void Run::startMill() const { digitalWrite(UI::RELAY_PIN, ON); }
 
-void Run::stopMill() const { digitalWrite(RELAY_PIN, OFF); }
+void Run::stopMill() const { digitalWrite(UI::RELAY_PIN, OFF); }
 
 void Run::start() {
     timeMode = &MillControl::TIME_MODE_SELECTOR.getMode();
@@ -49,7 +59,11 @@ void Run::start() {
         stopTime = millis() + (long) runDeciSeconds * 100l;
         runType = TIMED_RUN;
     }
+#ifdef MILL_BUTTON
     UI::millButton.setSingleClickButton();
+#else
+    UI::encoderButton.setSingleClickButton();
+#endif
     startMill();
     redraw();
 }
@@ -90,7 +104,7 @@ void Run::draw() {
 #endif
 
     UI::u8g.setFont(UI::FONT_LARGE_NUMERIC);
-    drawSymbol(x, y, runTime, UI::LARGE_LINE_HEIGHT, 4, 2);
+    UI::drawSymbol(x, y, runTime, UI::LARGE_LINE_HEIGHT, 4, 2);
 
     long remainingMillis = pauseTime ? pauseTime : stopTime - millis();
 
@@ -142,3 +156,9 @@ void Run::encoderChanged(int encoderPos) {
     }
     lastEncoderPos = encoderPos;
 }
+
+#ifdef BREW_BUTTON
+//This state will do nothing on a brew click
+void Run::brewClick() {
+}
+#endif

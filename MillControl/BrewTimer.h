@@ -5,32 +5,27 @@
 
 #include "State.h"
 
-class CalibrationRun : public State {
+#ifdef BREW_BUTTON
+
+class BrewTimer : public State {
     unsigned long startTime = 0;
-    unsigned long stopTime = 0;
     unsigned long updateTime = 0;
+    State* state;
 
 public:
-
     virtual void loop() override;
 
     virtual void start() override;
 
-#ifdef BREW_BUTTON
-    virtual void brewClick() override;
-#endif
-
     virtual void millClick(unsigned char i) override;
-
     virtual void encoderClick() override;
 
-    unsigned long getRunMillis();
+    virtual void encoderChanged(int encoderPos) override;
 
+    void setReturnState(State* state);
 protected:
     virtual void draw() override;
 
-public:
-    virtual void stop() override;
-
 };
 
+#endif

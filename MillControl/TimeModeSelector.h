@@ -1,11 +1,10 @@
 #pragma once
 
-#include "TimeLine.h"
 #include "State.h"
 #include "TimeMode.h"
 
 
-class TimeModeSelector : public State, public TimeLine {
+class TimeModeSelector : public State {
     int selectedMode;
     TimeModeList timeModes;
 public:

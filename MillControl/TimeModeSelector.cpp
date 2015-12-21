@@ -18,7 +18,7 @@ TimeModeSelector::TimeModeSelector() {
 void TimeModeSelector::start() {
     //If there is only one button ensure it is multi-click
 #ifndef MILL_BUTTON
-    UI::millButton.setMultiClickButton();
+    UI::encoderButton.setMultiClickButton();
 #endif
 
     setEncoderMode(timeModes.size(), selectedMode);
@@ -81,7 +81,7 @@ void TimeModeSelector::draw() {
             unsigned char y = lines > 2 ? ((UI::DISPLAY_HEIGHT- (UI::LINE_HEIGHT * 3)) / 6) + UI::LINE_HEIGHT + (((UI::DISPLAY_HEIGHT- (UI::LINE_HEIGHT *3)) / 3) + UI::LINE_HEIGHT ) * line :
                                           ((UI::DISPLAY_HEIGHT- (UI::LINE_HEIGHT * 2)) / 4) + UI::LINE_HEIGHT + (((UI::DISPLAY_HEIGHT- (UI::LINE_HEIGHT *2)) / 2) + UI::LINE_HEIGHT ) * line; //lines > 2 ? 16 + line * 22 : 23 + line * 32;  //16 + line * 22 : 23 + line * 32  - 
 #endif
-            drawTimeLine(t, time, y, x, mode.weightMode, false, false, false);
+            UI::drawTimeLine(t, time, y, x, mode.weightMode, false, false, false);
             line++;
         }
     }

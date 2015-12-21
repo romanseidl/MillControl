@@ -24,7 +24,9 @@ void CalibrationPrompt::encoderChanged(int encoderPos) {
 }
 
 void CalibrationPrompt::draw() {
-    CalibrationRun::draw();
+    State::draw();
+    UI::drawSubtitle(UI::CALIBRATION_TITLE);
+
     char c_t[6] = "";
     if(deciGrams < 1000)
         sprintf(c_t, "%i.%i", deciGrams / 10, deciGrams % 10);
