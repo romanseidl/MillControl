@@ -1,14 +1,14 @@
 #include "TimeEditor.h"
 #include "MillControl.h"
-
-void TimeEditor::start() {
+bool TimeEditor::start() {
+    DEBUG_PRINTLN("TimeEditor::open()");
     time = MillControl::EDITOR.getTime();
     setEncoderMode(1901, *time < 1000 ?  *time : 1000 + (*time - 1000) / 10) ;
-    redraw();
+    return true;
 }
 
 void TimeEditor::encoderClick() {
-    MillControl::setState(MillControl::EDITOR);
+    close();
 }
 
 void TimeEditor::encoderChanged(int encoderPos) {

@@ -1,18 +1,22 @@
 #pragma once
-
-#include "Button.h"
 #include "UI.h"
+#include <stddef.h>
+#include "Button.h"
+
 
 class State {
-private:
-    //the active mode - may be this or any sub-mode
 protected:
     void setEncoderMode(int, int);
+    bool close();
+
 
 public:
+    State* previousState = NULL;
     void redraw();
 
-    virtual void start();
+    virtual bool open();
+
+    virtual bool start();
     virtual void stop();
 
     //Draws the UI - title only for the master state
@@ -32,5 +36,8 @@ public:
     //Delegating loop function - false will exit a sub-mode (if there is one)
     virtual void loop();
 
+#ifdef DEBUG
+    virtual char*  getClassName() {return "State"; }
+#endif
 };
 

@@ -7,14 +7,27 @@
 
 class CalibrationPrompt : public State {
     int deciGrams = 70;
+    int position = 0;
+
+protected:
+    virtual void draw() override;
+
+    void draw(bool editor);
+
 public:
-    virtual void start() override;
+    virtual bool start() override;
+
+    virtual bool open() override;
 
     virtual void encoderClick() override;
 
     virtual void encoderChanged(int encoderPos) override;
+    void drawEditor();
 
-protected:
-    virtual void draw() override;
+    int *getTime();
+
+#ifdef DEBUG
+    virtual char*  getClassName() {return "CalibrationPrompt"; }
+#endif
 };
 

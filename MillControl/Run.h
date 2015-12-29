@@ -35,7 +35,7 @@ public:
 
     void setMode(unsigned char);
 
-    virtual void start() override;
+    virtual bool start() override;
 
     virtual void stop() override;
 
@@ -53,4 +53,8 @@ protected:
     virtual void loop() override;
 
     virtual void draw() override;
+
+#ifdef DEBUG
+    virtual char*  getClassName() {return "Run"; }
+#endif
 };

@@ -3,22 +3,43 @@
 //
 
 
+#include <Arduino.h>
 #include "BrewTimer.h"
 #include "MillControl.h"
 
 #ifdef BREW_BUTTON
 
 //Initialize the timer
-void BrewTimer::start() {
+bool BrewTimer::open() {
+  DEBUG_PRINTLN("open: BrewTimer");
+  if(!UI::brewButton.depressed()){
+    DEBUG_PRINTLN("opened: BrewTimer");
     updateTime = 0;
     startTime = millis();
-    redraw();
+    return true;
+  }
+  return false;
 }
 
-//Update Display & stop if brewer depressed
+//Return to the brew timer, will only start if it is alive
+bool BrewTimer::start() {
+    DEBUG_PRINTLN("start: BrewTimer");
+    return isRunning();
+}
+
+//Checks if the Brew Timer is alive
+bool BrewTimer::isRunning(){
+    if(startTime > 0 && UI::brewButton.depressed()){
+        DEBUG_PRINTLN("brewButton: depressed");
+        startTime = 0;
+    }
+    return startTime > 0;
+}
+
+//Update Display & stop if timer died
 void BrewTimer::loop() {
-    if(UI::brewButton.depressed())
-        encoderClick();
+    if(!isRunning())
+        close();
     else if (millis() > (updateTime + 250)) {
         updateTime = millis();
         redraw();
@@ -27,18 +48,19 @@ void BrewTimer::loop() {
 
 //Pass through the mill click
 void BrewTimer::millClick(unsigned char i) {
-    MillControl::setState(*state);
-    (*state).millClick(i);
+    DEBUG_PRINTLN("BrewTimer::MillClick");
+    //Forward the click to the state below
+    previousState->millClick(i);
 }
 
-//Get back to previous state
+//Get start to previous state
 void BrewTimer::encoderChanged(int encoderPos) {
     encoderClick();
 }
 
-//Get back to previous state
+//Start to previous state
 void BrewTimer::encoderClick() {
-    MillControl::setState(*state);
+    MillControl::start(*previousState);
 }
 
 //Very simple for now
@@ -57,9 +79,5 @@ void BrewTimer::draw() {
     UI::drawRunTime(x, y, (millis() - startTime) / 1000);
 }
 
-//Needed as this state does need to know where to return to
-void BrewTimer::setReturnState(State *_state) {
-    state = _state;
-}
-
 #endif
+

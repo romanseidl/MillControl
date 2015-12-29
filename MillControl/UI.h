@@ -3,12 +3,27 @@
 #include "RotatingEncoder.h"
 #include "Button.h"
 #include "State.h"
+
 #include <U8glib.h>
+
+//=================================================
+// DEBUG
+// If uncommented this will print debug messages to the serial port
+
+//#define DEBUG
+#ifdef DEBUG
+    #include <HardwareSerial.h>
+    #define DEBUG_PRINTLN(message)  (Serial.println(message))
+    #define DEBUG_PRINT(message)  (Serial.print(message))
+#else
+    #define DEBUG_PRINTLN(message)
+    #define DEBUG_PRINT(message)
+#endif
 
 //=================================================
 // BUTTONS
 
-//Comment out this line if there is no mill button
+// Comment out this line if there is no mill button
 // Change the Pin if you want it to be somewhere else
 #define MILL_BUTTON 5
 
@@ -38,15 +53,16 @@ public:
     static constexpr char *BREW_TITLE = "Brewing";
     static constexpr char *CALIBRATION_TITLE = "Calibration";
 
+    static constexpr char *DEL_STRING = "x";
+    static constexpr char *ADD_STRING = "+";
+    static constexpr char *MOVE_LEFT_STRING = "<";
+    static constexpr char *MOVE_RIGHT_STRING = ">";
     //=================================================
     // Relay Pin - change the pin if you want it to be somewhere else
     static const unsigned char RELAY_PIN = 7;
 
-    //=================================================
-    // Pause time
-    // when stopping a timed run by pressing the button the mill will wait for
-    // the given amount of seconds to allow for a restart
     static const unsigned char PAUSE_TIME;
+    static const long BREW_TIMER_TIMEOUT;
 
     static const u8g_fntpgm_uint8_t* FONT_SMALL;
     static const u8g_fntpgm_uint8_t* FONT_NUMERIC;
@@ -84,7 +100,10 @@ public:
     static void drawTimeLine(char line, const int data, unsigned char y, unsigned char x, unsigned char grams,
                              const bool small, bool selected, bool editor);
     static void drawRunTime(const unsigned char x, const unsigned char y, int seconds);
+
+    static void drawEditPoint(const unsigned char p, const bool active, const char *symbol);
+
 };
 
-//DEBUG OUTPUT
-//#define DEBUG
+
+

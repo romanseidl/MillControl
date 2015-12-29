@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Arduino.h>
 #include "Run.h"
 #include "MillControl.h"
 
@@ -20,7 +21,7 @@ void Run::loop() {
 #endif
         )
     {
-        MillControl::setState(MillControl::TIME_MODE_SELECTOR);
+        close();
     } else if (millis() > (updateTime + 250)) {
         updateTime = millis();
         redraw();
@@ -41,7 +42,8 @@ void Run::startMill() const { digitalWrite(UI::RELAY_PIN, ON); }
 
 void Run::stopMill() const { digitalWrite(UI::RELAY_PIN, OFF); }
 
-void Run::start() {
+bool Run::start() {
+    DEBUG_PRINTLN("open: Run");
     timeMode = &MillControl::TIME_MODE_SELECTOR.getMode();
     pauseTime = 0;
 
@@ -65,7 +67,7 @@ void Run::start() {
     UI::encoderButton.setSingleClickButton();
 #endif
     startMill();
-    redraw();
+    return true;
 }
 
 //If this is a timed tun this will only stop
@@ -82,7 +84,7 @@ void Run::millClick(unsigned char clickType) {
             pauseTime = 0;
         }
     } else
-        MillControl::setState(MillControl::TIME_MODE_SELECTOR);
+        close();
 }
 
 void Run::encoderClick() {
@@ -160,5 +162,6 @@ void Run::encoderChanged(int encoderPos) {
 #ifdef BREW_BUTTON
 //This state will do nothing on a brew click
 void Run::brewClick() {
+    MillControl::openInBackground(MillControl::BREW_TIMER);
 }
 #endif

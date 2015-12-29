@@ -3,13 +3,15 @@
 //
 #include "MillControl.h"
 
+
 TimeModeSelector        MillControl::TIME_MODE_SELECTOR;
 Editor                  MillControl::EDITOR;
 TimeEditor              MillControl::TIME_EDITOR;
 CharEditor              MillControl::CHAR_EDITOR;
 Run                     MillControl::RUN;
-CalibrationRun    MillControl::WEIGHT_CALIBRATOR;
+CalibrationRun          MillControl::WEIGHT_CALIBRATOR;
 CalibrationPrompt       MillControl::CALIBRATION_PROMPT;
+CalibrationTimeEditor   MillControl::CALIBRATION_TIME_EDITOR;
 
 #ifdef BREW_BUTTON
     BrewTimer               MillControl::BREW_TIMER;
@@ -18,14 +20,106 @@ CalibrationPrompt       MillControl::CALIBRATION_PROMPT;
 State *MillControl::state = &TIME_MODE_SELECTOR;
 
 void MillControl::setup() {
-    state->start();
+    state->open();
+    state->redraw();
 }
 
-void MillControl::setState(State &_state) {
-    state->stop();
-    state = &_state;
-    state->start();
+#ifdef DEBUG
+#define STACK() {\
+        DEBUG_PRINTLN("Stack:");\
+        State *s = state; \
+        while (s != NULL){\
+            DEBUG_PRINT("# "); \
+            DEBUG_PRINTLN(s->getClassName());\
+            s= s->previousState;\
+        }\
+    }
+#else
+#define STACK()
+#endif
+
+//start the previous state and remove from stack if possible
+void MillControl::close(State *closeState) {
+    DEBUG_PRINT("close: ");
+    DEBUG_PRINTLN(closeState->getClassName());
+
+    closeState->stop();
+    if(remove(closeState) != NULL) {
+        if(state->start())
+           state->redraw();
+        else
+            close(state);
+    };
+    STACK();
 }
+
+State * MillControl::remove(State *find) {
+    DEBUG_PRINT("remove: ");
+    DEBUG_PRINTLN(find->getClassName());
+
+    if (find == state) {
+        state = find->previousState;
+        return state;
+    } else {
+        State *before = state;
+        while (before != NULL && before->previousState != find)
+            before = before->previousState;
+        if(before != NULL)
+            before->previousState = find->previousState;
+        return NULL;
+    }
+}
+
+void MillControl::open(State &newState) {
+    start(newState, true);
+}
+
+void MillControl::openInBackground(State &newState) {
+    DEBUG_PRINT("openInBackground: ");
+    DEBUG_PRINTLN(newState.getClassName());
+    bool opened = newState.open();
+    if(opened) {
+        //Insert state behind top
+        remove(&newState);
+        newState.previousState = state->previousState;
+        state->previousState  = &newState;
+        STACK();
+    }
+}
+
+void MillControl::start(State &newState, bool open) {
+    DEBUG_PRINT("start: ");
+    DEBUG_PRINTLN(newState.getClassName());
+
+    //Stop the old state
+    state->stop();
+
+    //Pull it from the stack
+    remove(&newState);
+
+    //put it on top of the stack
+    newState.previousState = state;
+    state = &newState;
+
+    bool started;
+    if(!open){
+        started = newState.start();
+    } else {
+        started = newState.open();
+    }
+
+    //Do I need this Idea of a state not starting?
+    if(started) {
+        //redraw
+        state->redraw();
+    } else {
+        //restart the old state
+        state = newState.previousState;
+        state->start();
+    };
+    STACK();
+}
+
 
 //Handle user input
 void MillControl::loop() {
@@ -74,9 +168,7 @@ void MillControl::loop() {
 #ifdef BREW_BUTTON
     // Only the long click is used
     else if (brewClicks < 0) {
-#ifdef DEBUG
-        Serial.println("brewClick");
-#endif
+        DEBUG_PRINTLN("brewClick()");
         state->brewClick();
     }
 #endif
@@ -90,3 +182,6 @@ void MillControl::loop() {
 State *MillControl::getState() {
     return state;
 }
+
+
+

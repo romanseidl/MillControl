@@ -7,12 +7,14 @@
 class TimeModeSelector : public State {
     int selectedMode;
     TimeModeList timeModes;
+    unsigned long updateTime;
 public:
+    virtual bool start() override;
     virtual void stop() override;
 
-    TimeModeSelector();
+    virtual void loop() override;
 
-    void start();
+    TimeModeSelector();
 
     virtual void draw() override;
 
@@ -33,5 +35,9 @@ public:
     void eepromWrite();
 
     void setEncoderPos(int encoderPos);
+
+#ifdef DEBUG
+    virtual char*  getClassName() {return "TimeModeSelector"; }
+#endif
 };
 

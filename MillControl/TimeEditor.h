@@ -6,10 +6,11 @@
 // EditTime State
 
 class TimeEditor : public State {
+protected:
     int *time;
 public:
 
-    virtual void start() override;
+    virtual bool start() override;
 
     virtual void encoderClick() override;
 
@@ -17,6 +18,9 @@ public:
 
     virtual void encoderChanged(int encoderPos) override;
 
+#ifdef DEBUG
+    virtual char*  getClassName() {return "TimeEditor"; }
+#endif
 };
 
 

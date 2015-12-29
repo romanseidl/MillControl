@@ -4,7 +4,7 @@
 const char CharEditor::CHARACTERS[]= " ABCDEFGHIJLKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890/-+*&!?:#'()[]";
 const unsigned char CharEditor::CHARACTERS_COUNT = sizeof(CharEditor::CHARACTERS) - 1;
 
-void CharEditor::start() {
+bool CharEditor::start() {
     c = MillControl::EDITOR.getChar();
 
     int encoderPosition = 0;
@@ -12,10 +12,11 @@ void CharEditor::start() {
         encoderPosition++;
 
     setEncoderMode(CHARACTERS_COUNT, encoderPosition);
+    return true;
 }
 
 void CharEditor::encoderClick() {
-    MillControl::setState(MillControl::EDITOR);
+    close();
 }
 
 void CharEditor::encoderChanged(int encoderPos) {

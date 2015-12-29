@@ -10,22 +10,27 @@
 class BrewTimer : public State {
     unsigned long startTime = 0;
     unsigned long updateTime = 0;
-    State* state;
+protected:
+    virtual void draw() override;
 
 public:
     virtual void loop() override;
 
-    virtual void start() override;
+    virtual bool start() override;
 
     virtual void millClick(unsigned char i) override;
     virtual void encoderClick() override;
 
     virtual void encoderChanged(int encoderPos) override;
 
-    void setReturnState(State* state);
-protected:
-    virtual void draw() override;
+    bool isRunning();
 
+
+    virtual bool open() override;
+
+#ifdef DEBUG
+    virtual char*  getClassName() {return "BrewTimer"; }
+#endif
 };
 
 #endif

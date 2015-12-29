@@ -12,7 +12,7 @@ class CharEditor : public State {
     char *c;
 public:
 
-    virtual void start() override;
+    virtual bool start() override;
 
     virtual void encoderClick() override;
 
@@ -20,6 +20,9 @@ public:
 
     virtual void encoderChanged(int encoderPos) override;
 
+#ifdef DEBUG
+    virtual char*  getClassName() {return "CharEditor"; }
+#endif
 };
 
 

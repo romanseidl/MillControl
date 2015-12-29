@@ -66,7 +66,7 @@ if(NOT ARDUINO_SDK_PATH)
     list(SORT SDK_PATH_HINTS)
     list(REVERSE SDK_PATH_HINTS)
 endif()
-
+message(ARDUINO_SDK_PATH)
 find_path(ARDUINO_SDK_PATH
           NAMES lib/version.txt
           PATH_SUFFIXES share/arduino

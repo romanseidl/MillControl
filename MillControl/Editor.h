@@ -8,16 +8,7 @@ static constexpr char SYMBOL_BACK[2] = {171, 0};
 class TimeModeSelector;
 
 class Editor : public State {
-    static const char DEL_STRING[2];
-    static const char ADD_STRING[2];
-    static const char MOVE_LEFT_STRING[2];
-    static const char MOVE_RIGHT_STRING[2];
-
-    int position;
-public:
-    virtual void start() override;
-
-    virtual void stop() override;
+    int position = 0;
 
     unsigned char back = 0;
     unsigned char gram = 0;
@@ -31,25 +22,26 @@ public:
 
     TimeMode* timeMode;
     TimeModeList* timeModes;
-
-    void drawEditPoint(unsigned char p, const unsigned char pos, const char *symbol) const;
-    
-    void draw(bool editor);
 public:
+    virtual bool start() override;
+    virtual void stop() override;
+
     void encoderClick();
-
     virtual void millClick(unsigned char i) override;
-
     virtual void encoderChanged(int encoderPos) override;
 
     virtual void draw();
 
     int *getTime();
-
     char *getChar();
 
+    void drawEditPoint(unsigned char p, const unsigned char pos, const char *symbol) const;
+    void draw(bool editor);
     void drawEditor();
 
+#ifdef DEBUG
+    virtual char*  getClassName() {return "Editor"; }
+#endif
 };
 
 

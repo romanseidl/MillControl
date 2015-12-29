@@ -2,7 +2,6 @@
 // Created by roman on 21.12.15.
 //
 
-#include "CalibrationRun.h"
 #include "UI.h"
 #include "TimeMode.h"
 
@@ -152,4 +151,26 @@ void UI::drawRunTime(const unsigned char x, const unsigned char y, int seconds){
 
     u8g.setFont(FONT_REGULAR);
     u8g.drawStr(x, y, "s");
+}
+
+void UI::drawEditPoint(const unsigned char p, const bool active, const char *symbol){
+//    UI::u8g.setFont(UI::FONT_SMALL);
+#ifdef PORTRAIT_DISPLAY
+    const int x = (DISPLAY_WIDTH / 6) * p + (p > 0 ? ((DISPLAY_WIDTH / 6) - u8g.getStrWidth(UI::MOVE_RIGHT_STRING)) : 0);
+    const int y = DISPLAY_HEIGHT - 2 * BORDER_WIDTH;
+#else
+    const int x = UI::DISPLAY_WIDTH - (p == 0 ? (2 * UI::SMALL_LINE_HEIGHT + UI::BORDER_WIDTH * 4) :
+                                                    (UI::SMALL_LINE_HEIGHT + UI::BORDER_WIDTH * 2));
+    const int y = p > 1 ? ( (p-1) * (UI::DISPLAY_HEIGHT - 2 * UI::SMALL_LINE_HEIGHT - 2 * UI::BORDER_WIDTH -1) / 3 + UI::SMALL_LINE_HEIGHT)  : UI::SMALL_LINE_HEIGHT;
+#endif
+
+    if(symbol)
+      u8g.drawStr(x, y, symbol);
+    else
+      drawDirectionSymbol(x+ SMALL_LINE_HEIGHT / 2 - UI::BORDER_WIDTH, y, SMALL_LINE_HEIGHT, true);
+
+    if (active) {
+      unsigned char w = symbol ? u8g.getStrWidth(symbol) : SMALL_LINE_HEIGHT;
+      u8g.drawHLine(x, y + 1, w);
+    }
 }

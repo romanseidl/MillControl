@@ -12,10 +12,10 @@ link_directories(/home/roman/sketchbook/libraries/)
 
 
 set(${CMAKE_PROJECT_NAME}_SKETCH MillControl.ino)
-link_directories(/home/roman/sketchbook/libraries/)
 
 set(${CMAKE_PROJECT_NAME}_BOARD pro5v328)
 set(${CMAKE_PROJECT_NAME}_PORT /dev/ttyUSB0)
 set(${CMAKE_PROJECT_NAME}_SERIAL picocom @SERIAL_PORT@ -b 9600 -l)
+
 
 generate_arduino_firmware(${CMAKE_PROJECT_NAME})

@@ -11,26 +11,25 @@ class CalibrationRun : public State {
     unsigned long updateTime = 0;
 
 public:
+    virtual bool open() override;
+    virtual bool start() override;
+    virtual void stop() override;
 
     virtual void loop() override;
-
-    virtual void start() override;
 
 #ifdef BREW_BUTTON
     virtual void brewClick() override;
 #endif
 
     virtual void millClick(unsigned char i) override;
-
     virtual void encoderClick() override;
+
+    virtual void draw() override;
 
     unsigned long getRunMillis();
 
-protected:
-    virtual void draw() override;
-
-public:
-    virtual void stop() override;
-
+#ifdef DEBUG
+    virtual char*  getClassName() {return "CalibrationRun"; }
+#endif
 };
 

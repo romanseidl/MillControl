@@ -1,3 +1,4 @@
+
 #include "State.h"
 #include "MillControl.h"
 
@@ -5,6 +6,7 @@
 // State
 
 void State::redraw() {
+    //DEBUG_PRINTLN("redraw()");
     UI::u8g.firstPage();
     do {
         draw();
@@ -19,17 +21,24 @@ void State::millClick(unsigned char clickType) {
 }
 
 #ifdef BREW_BUTTON
-//Will start the brew timer
+//Will open the brew timer
 void State::brewClick() {
-    MillControl::BREW_TIMER.setReturnState(MillControl::getState());
-    MillControl::setState(MillControl::BREW_TIMER);
+    MillControl::open(MillControl::BREW_TIMER);
 }
 #endif
 
+// Called when ste state is stopped
 void State::stop() {
 }
 
-void State::start() {
+// Called when the state is opened, defaults to dointhe same as when started
+bool State::open() {
+    return start();
+}
+
+// Is called when the State is started
+bool State::start() {
+    return true;
 }
 
 void State::loop() {
@@ -43,5 +52,14 @@ void State::encoderClick() {
 
 void State::draw() {
     UI::drawTitle(MillControl::TIME_MODE_SELECTOR.getMode().name);
+}
+
+//go start to the previous state
+bool State::close() {
+    if (!previousState == NULL) {
+        MillControl::close(this);
+        return true;
+    } else
+        return false;
 }
 

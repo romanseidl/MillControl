@@ -2,14 +2,15 @@
 // Created by roman on 03.12.15.
 //
 
+#include <Arduino.h>
 #include "CalibrationRun.h"
 #include "MillControl.h"
 
-void CalibrationRun::start() {
+bool CalibrationRun::open() {
     updateTime = 0;
     startTime = millis();
     MillControl::RUN.startMill();
-    redraw();
+    return true;
 }
 
 void CalibrationRun::loop() {
@@ -24,6 +25,10 @@ void CalibrationRun::loop() {
     }
 }
 
+bool CalibrationRun::start() {
+    return close();
+}
+
 void CalibrationRun::stop() {
     stopTime = millis();
     MillControl::RUN.stopMill();
@@ -35,7 +40,7 @@ void CalibrationRun::millClick(unsigned char i) {
 
 
 void CalibrationRun::encoderClick() {
-    MillControl::setState(MillControl::CALIBRATION_PROMPT);
+    MillControl::open(MillControl::CALIBRATION_PROMPT);
 }
 
 void CalibrationRun::draw() {
@@ -60,5 +65,8 @@ unsigned long CalibrationRun::getRunMillis() {
 #ifdef BREW_BUTTON
 //No brew timer here
 void CalibrationRun::brewClick() {
+    MillControl::openInBackground(MillControl::BREW_TIMER);
 }
 #endif
+
+

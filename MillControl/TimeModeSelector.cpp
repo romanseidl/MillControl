@@ -15,14 +15,24 @@ TimeModeSelector::TimeModeSelector() {
     }
 }
 
-void TimeModeSelector::start() {
+bool TimeModeSelector::start() {
+    DEBUG_PRINTLN("start: TimeModeSelector");
     //If there is only one button ensure it is multi-click
 #ifndef MILL_BUTTON
     UI::encoderButton.setMultiClickButton();
 #endif
-
     setEncoderMode(timeModes.size(), selectedMode);
-    redraw();
+    updateTime = millis();
+    return true;
+}
+
+void TimeModeSelector::loop() {
+#ifdef BREW_BUTTON
+    //re-show the bre timer after a timeout if its running
+    if(millis() - updateTime > UI::BREW_TIMER_TIMEOUT && MillControl::BREW_TIMER.isRunning()){
+        MillControl::start(MillControl::BREW_TIMER);
+    }
+#endif
 }
 
 TimeMode &TimeModeSelector::getMode() {
@@ -31,17 +41,18 @@ TimeMode &TimeModeSelector::getMode() {
 
 void TimeModeSelector::setMode(TimeMode *mode) {
     setEncoderPos(timeModes.pos(*mode));
+    updateTime = millis();
     redraw();
 }
 
 void TimeModeSelector::encoderClick() {
-    MillControl::setState(MillControl::EDITOR);
+    MillControl::open(MillControl::EDITOR);
 }
 
 void TimeModeSelector::millClick(unsigned char clickType) {
     if(getMode().getDeciSeconds(clickType)){
       MillControl::RUN.setMode(clickType);
-      MillControl::setState(MillControl::RUN);
+        MillControl::open(MillControl::RUN);
     }
 }
 
@@ -103,3 +114,4 @@ void TimeModeSelector::eepromWrite() {
 
 void TimeModeSelector::stop() {
 }
+

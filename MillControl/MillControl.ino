@@ -55,6 +55,12 @@ RotatingEncoder UI::encoder(2, 3);
 const unsigned char UI::PAUSE_TIME = 5;
 
 //=================================================
+// Brew timer Timeout
+// when in the main selector (time mode selector) and the brew timer is active
+// after the given amount of milliseconds until the brew timer is shown again if it was interrupted
+const long UI::BREW_TIMER_TIMEOUT = 3000;
+
+//=================================================
 // Display
 
 // Orientation of the display can be changed in UI.h
@@ -146,15 +152,16 @@ void setup() {
     //Rotate the screen
     UI::u8g.setRot90();
 #endif
-    MillControl::setup();
 #ifdef DEBUG
     Serial.begin(9600);
-    Serial.println("Setup");
+    DEBUG_PRINTLN("Setup");
 #endif
+    MillControl::setup();
+    DEBUG_PRINTLN("Setup completed");
 }
 
 void loop() {
-    Serial.print(".");
+    //DEBUG_PRINT(".");
     MillControl::loop();
 }
 
