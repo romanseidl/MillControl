@@ -3,8 +3,6 @@
 #include "TimeMode.h"
 #include "State.h"
 
-static constexpr char SYMBOL_BACK[2] = {171, 0};
-
 class TimeModeSelector;
 
 class Editor : public State {

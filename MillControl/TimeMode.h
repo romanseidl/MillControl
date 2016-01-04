@@ -31,7 +31,9 @@ public:
 class TimeModeList {
     static const unsigned char EEPROM_VERSION = 2;
     static const int INIT_TEMPLATES = 3;
-    static constexpr char *INIT_NAMES[INIT_TEMPLATES] = {"Time", "Weight", "Direct"};
+    static constexpr char *INIT_NAMES[INIT_TEMPLATES] = {(char *const) "Time",
+                                                         (char *const) "Weight",
+                                                         (char *const) "Direct"};
     static constexpr bool INIT_WEIGHT_MODES[INIT_TEMPLATES] = {false, true, false};
     static constexpr int INIT_TIMES[INIT_TEMPLATES][3] = {{50,                    100, 150},
                                                          {70,                     140, 160},

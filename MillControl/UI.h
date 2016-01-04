@@ -47,16 +47,16 @@ class UI {
 protected:
     //=================================================
     // Titles - change these titles if you would like to have different titles - be aware that size matters...
-    static constexpr char *SPECIAL_TIME_START_NAME = "start";
-    static constexpr char *SPECIAL_TIME_HOLD_NAME = "hold";
+    static constexpr char *SPECIAL_TIME_START_NAME = (char *const) "start";
+    static constexpr char *SPECIAL_TIME_HOLD_NAME = (char *const) "hold";
 public:
-    static constexpr char *BREW_TITLE = "Brewing";
-    static constexpr char *CALIBRATION_TITLE = "Calibration";
+    static constexpr char *BREW_TITLE = (char *const) "Brewing";
+    static constexpr char *CALIBRATION_TITLE = (char *const) "Calibration";
 
-    static constexpr char *DEL_STRING = "x";
-    static constexpr char *ADD_STRING = "+";
-    static constexpr char *MOVE_LEFT_STRING = "<";
-    static constexpr char *MOVE_RIGHT_STRING = ">";
+    static constexpr char *DEL_STRING = (char *const) "x";
+    static constexpr char *ADD_STRING = (char *const) "+";
+    static constexpr char *MOVE_LEFT_STRING = (char *const) "<";
+    static constexpr char *MOVE_RIGHT_STRING = (char *const) ">";
     //=================================================
     // Relay Pin - change the pin if you want it to be somewhere else
     static const unsigned char RELAY_PIN = 7;
