@@ -35,12 +35,14 @@ void Run::stop() {
 #else
     UI::encoderButton.setMultiClickButton();
 #endif
-    UI::u8g.begin(); //resetting display - might help if there is interferences with the mill switch
 }
 
 void Run::startMill() const { digitalWrite(UI::RELAY_PIN, ON); }
 
-void Run::stopMill() const { digitalWrite(UI::RELAY_PIN, OFF); }
+void Run::stopMill() const { 
+    digitalWrite(UI::RELAY_PIN, OFF); 
+    UI::u8g.begin(); //resetting display - might help if there is interferences with the mill switch
+}
 
 bool Run::start() {
     DEBUG_PRINTLN("open: Run");
