@@ -7,12 +7,12 @@
 
 class Run : public State {
 
-    static const unsigned char PROGMEM ON = LOW;
-    static const unsigned char PROGMEM OFF = HIGH;
+    static const unsigned char ON = LOW;
+    static const unsigned char OFF = HIGH;
 
-    static const unsigned char PROGMEM TIMED_RUN = 0;
-    static const unsigned char PROGMEM STOP_RUN = 1;
-    static const unsigned char PROGMEM HOLD_RUN = 2;
+    static const unsigned char TIMED_RUN = 0;
+    static const unsigned char STOP_RUN = 1;
+    static const unsigned char HOLD_RUN = 2;
 
 
     unsigned char runType;
@@ -44,7 +44,6 @@ public:
     virtual void encoderClick() override;
 
 #ifdef BREW_BUTTON
-
     virtual void brewClick();
 #endif
 
