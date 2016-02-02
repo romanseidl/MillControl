@@ -52,7 +52,7 @@
 
 //=================================================
 // RESET MODE
-// Set this and flash once to reset data
+// Set this and flash once to reset data - don't forget to comment it out again!
 // You can usually also reset all data by deteling all pages
 
 #define RESET_MODE
