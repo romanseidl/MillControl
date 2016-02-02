@@ -1,12 +1,14 @@
 #include "MillControl.h"
 
 bool Editor::start() {
+    //get the current mode
     timeMode = &MillControl::TIME_MODE_SELECTOR.getMode();
-    timeModes = &MillControl::TIME_MODE_SELECTOR.getTimeModes();
+    //get all time modes - needed for adding and deleting
+    timeModes = &MillControl::TIME_MODE_SELECTOR.timeModes;
 
-    firstChar = TimeMode::DATA_PER_MODE + (timeMode->weightMode ? 1 : 0);
+    firstChar = (unsigned char) (Mode::DATA_PER_MODE + (timeMode->weightMode ? 1 : 0));
 
-    const int size = MillControl::TIME_MODE_SELECTOR.size();
+    const int size = timeModes->size;
 
     back = firstChar++;
 
@@ -15,16 +17,12 @@ bool Editor::start() {
     else
         gram = 0;
 
-    if (size < TimeModeList::MAX_MODES && !deleteMode)
+    if (size < ModeList::MAX_MODES && !deleteMode)
         add = firstChar++;
     else
         add = 0;
 
-    if (size > 1)
-        del = firstChar++;
-    else
-        del = 0;
-
+    del = firstChar++;
 
     if (size > 2 && !deleteMode) {
         left = firstChar++;
@@ -37,9 +35,10 @@ bool Editor::start() {
     if (deleteMode)
         setEncoderMode(2, 0);
     else
-        setEncoderMode(firstChar + TimeMode::MAX_CHARS, position);
+        setEncoderMode(firstChar + Mode::MAX_CHARS, position);
 
-    //if there is not mill button i need a multi click button in the gram editor
+    DEBUG_PRINTLN("editor set up");
+    //if there is no mill button i need a multi click button in the gram editor
 #ifndef MILL_BUTTON
     if(timeMode->weightMode)
         UI::encoderButton.setMultiClickButton();
@@ -99,6 +98,7 @@ void Editor::encoderClick() {
             close();
             return;
         } else {
+            position = back;
             deleteMode = true;
         }
     } else if (position >= firstChar) {
@@ -109,7 +109,7 @@ void Editor::encoderClick() {
     redraw();
 }
 
-//In Weight Mode encoder click starts the calibration mode
+//In Weight Mode rotator click starts the calibration mode
 void Editor::millClick(unsigned char i) {
     if(timeMode->weightMode)
         MillControl::open(MillControl::WEIGHT_CALIBRATOR);
@@ -137,7 +137,7 @@ void Editor::drawEditor() {
 void Editor::draw(bool editor) {
     State::draw();
     unsigned char weightMode = timeMode->weightMode ? 1 : 0;
-    for (char t = -weightMode; t < TimeMode::DATA_PER_MODE; t++) {
+    for (char t = -weightMode; t < Mode::DATA_PER_MODE; t++) {
 
         const char pos = t + weightMode;
         
@@ -189,7 +189,7 @@ void Editor::draw(bool editor) {
 
     if (position >= firstChar) {
         UI::u8g.setFont(UI::FONT_REGULAR);
-        char charBuf[TimeMode::MAX_CHARS + 1];
+        char charBuf[Mode::MAX_CHARS + 1];
 
         const int i = position - firstChar;
         memcpy(charBuf, &timeMode->name, i + 1);

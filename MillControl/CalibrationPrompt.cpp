@@ -24,8 +24,8 @@ void CalibrationPrompt::encoderClick() {
         case 1:
             {
                 long centiSecondsPerGram = MillControl::WEIGHT_CALIBRATOR.getRunMillis() / deciGrams;
-                if(centiSecondsPerGram > TimeMode::SPECIAL_DATA)
-                    centiSecondsPerGram = TimeMode::SPECIAL_DATA;
+                if (centiSecondsPerGram > Mode::SPECIAL_DATA)
+                    centiSecondsPerGram = Mode::SPECIAL_DATA;
                 MillControl::TIME_MODE_SELECTOR.getMode().centiSecondsPerGram = centiSecondsPerGram;
                 close();
             }

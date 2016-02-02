@@ -1,14 +1,11 @@
 #pragma once
-#include "UI.h"
-#include <stddef.h>
-#include "Button.h"
 
+#include "UI.h"
 
 class State {
 protected:
     void setEncoderMode(int, int);
     bool close();
-
 
 public:
     State* previousState = NULL;
@@ -37,7 +34,7 @@ public:
     virtual void loop();
 
 #ifdef DEBUG
-    virtual char*  getClassName() {return "State"; }
+    virtual char*  getClassName() {return (char *) "State"; }
 #endif
 };
 

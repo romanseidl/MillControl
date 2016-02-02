@@ -1,7 +1,6 @@
 #include "TimeEditor.h"
 #include "MillControl.h"
 bool TimeEditor::start() {
-    DEBUG_PRINTLN("TimeEditor::open()");
     time = MillControl::EDITOR.getTime();
     setEncoderMode(1901, *time < 1000 ?  *time : 1000 + (*time - 1000) / 10) ;
     return true;

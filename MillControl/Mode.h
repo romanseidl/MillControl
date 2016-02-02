@@ -1,7 +1,7 @@
 #pragma once
 #include "UI.h"
 
-class TimeMode {
+class Mode {
     int secondsForGrams(int grams) const;
 
 public:
@@ -10,13 +10,17 @@ public:
     static const unsigned char MAX_CHARS = 10;
 
     #ifdef MILL_BUTTON
-        static const unsigned char DATA_PER_MODE = 3;
+#ifdef FLAT_MODE
+    static const unsigned char DATA_PER_MODE = 2;
+#else
+    static const unsigned char PROGMEM DATA_PER_MODE = 3;
+#endif
     #else
         static const unsigned char DATA_PER_MODE = 2;
     #endif
 
     char name[MAX_CHARS + 1];
-    int data[3] = {0, 0, 0};
+    int data[DATA_PER_MODE];
 
     bool weightMode = false;
     int centiSecondsPerGram = 70;
@@ -26,49 +30,47 @@ public:
 };
 
 //--------------------------------------------------------------------------------------------
-// TimeModeList
+// ModeList
 
-class TimeModeList {
-    static const unsigned char EEPROM_VERSION = 2;
-    static const int INIT_TEMPLATES = 3;
+class ModeList {
+    static const unsigned char EEPROM_VERSION = 3;
+    static const unsigned char INIT_TEMPLATES = 3;
     static constexpr char *INIT_NAMES[INIT_TEMPLATES] = {(char *const) "Time",
                                                          (char *const) "Weight",
                                                          (char *const) "Direct"};
     static constexpr bool INIT_WEIGHT_MODES[INIT_TEMPLATES] = {false, true, false};
-    static constexpr int INIT_TIMES[INIT_TEMPLATES][3] = {{50,                    100, 150},
-                                                         {70,                     140, 160},
-                                                         {TimeMode::SPECIAL_DATA, 0,   TimeMode::SPECIAL_DATA}};
+    static constexpr int INIT_TIMES[INIT_TEMPLATES][3] = {{50,                 100, 150},
+                                                          {70,                 140, 160},
+                                                          {Mode::SPECIAL_DATA, 0,   Mode::SPECIAL_DATA}};
 
 public:
-    static const unsigned char MAX_MODES = 20;
+    static const unsigned char PROGMEM MAX_MODES = 20;
+    unsigned char size = 0;
 private:
-    TimeMode timeModes[MAX_MODES];
-    int timeModesCount=0;
 
-    void swap(int tm_from, int tm_to);
-    TimeMode &add(int);
+    void swap(unsigned char from, unsigned char to);
+
+    Mode &add(unsigned char pos);
 public:
-    TimeModeList();
+    ModeList();
 
-    TimeMode &add();
+    void reset();
 
-    TimeMode &insertAfer(TimeMode&);
+    Mode timeModes[MAX_MODES];
 
-    int size();
+    Mode &insertAfer(Mode &);
 
-    int pos(TimeMode &);
+    unsigned char pos(Mode &);
 
-    TimeMode& moveLeft(TimeMode &);
+    Mode &moveLeft(Mode &);
 
-    TimeMode& moveRight(TimeMode &);
+    Mode &moveRight(Mode &);
 
-    TimeMode &del(TimeMode &);
+    Mode &del(Mode &);
 
     void eepromRead();
 
     void eepromWrite();
-
-    TimeMode &get(int);
 
 };
 

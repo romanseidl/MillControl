@@ -5,24 +5,24 @@ RotatingEncoder::RotatingEncoder(unsigned char pin1, unsigned char pin2) {
 }
 
 int RotatingEncoder::getPosition() {
-    const int p = (((*encoder).read() / 4) + startticks) % ticks;
-    return p >= 0 ? p : ticks + p;
+    const int p = (((*RotatingEncoder::encoder).read() / 4) + RotatingEncoder::startticks) % RotatingEncoder::ticks;
+    return p >= 0 ? p : RotatingEncoder::ticks + p;
 }
 
 bool RotatingEncoder::updated() {
     int newpos = getPosition();
-    bool change = pos != newpos;
-    pos = newpos;
+    bool change = RotatingEncoder::pos != newpos;
+    RotatingEncoder::pos = newpos;
     return change;
 }
 
-
 void RotatingEncoder::setPosititon(int _startticks) {
-    startticks = _startticks;
-    (*encoder).write(0);
+    RotatingEncoder::startticks = _startticks;
+    (*RotatingEncoder::encoder).write(0);
 }
 
 void RotatingEncoder::setMode(int _ticks, int _startticks) {
-    ticks = _ticks;
+    RotatingEncoder::ticks = _ticks;
     setPosititon(_startticks);
 }
+

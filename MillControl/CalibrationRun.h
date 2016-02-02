@@ -18,7 +18,8 @@ public:
     virtual void loop() override;
 
 #ifdef BREW_BUTTON
-    virtual void brewClick() override;
+
+    virtual void brewClick();
 #endif
 
     virtual void millClick(unsigned char i) override;
@@ -29,7 +30,7 @@ public:
     unsigned long getRunMillis();
 
 #ifdef DEBUG
-    virtual char*  getClassName() {return "CalibrationRun"; }
+    virtual char*  getClassName() {return (char *) "CalibrationRun"; }
 #endif
 };
 

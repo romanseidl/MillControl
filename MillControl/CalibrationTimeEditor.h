@@ -12,7 +12,7 @@ public:
     virtual void encoderClick() override;
 
 #ifdef DEBUG
-    virtual char*  getClassName() {return "CalibrationTimeEditor"; }
+    virtual char*  getClassName() {return (char *) "CalibrationTimeEditor"; }
 #endif
 };
 

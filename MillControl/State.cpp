@@ -6,7 +6,7 @@
 // State
 
 void State::redraw() {
-    //DEBUG_PRINTLN("redraw()");
+    DEBUG_PRINTLN("redraw()");
     UI::u8g.firstPage();
     do {
         draw();
@@ -14,7 +14,7 @@ void State::redraw() {
 }
 
 void State::setEncoderMode(int positions, int position) {
-    UI::encoder.setMode(positions, position);
+    UI::rotator->setMode(positions, position);
 }
 
 void State::millClick(unsigned char clickType) {
@@ -23,6 +23,7 @@ void State::millClick(unsigned char clickType) {
 #ifdef BREW_BUTTON
 //Will open the brew timer
 void State::brewClick() {
+    DEBUG_PRINTLN("State::brewClick()");
     MillControl::open(MillControl::BREW_TIMER);
 }
 #endif
@@ -31,7 +32,7 @@ void State::brewClick() {
 void State::stop() {
 }
 
-// Called when the state is opened, defaults to dointhe same as when started
+// Called when the state is opened, defaults to doing the same as when started
 bool State::open() {
     return start();
 }

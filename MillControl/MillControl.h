@@ -4,7 +4,7 @@
  * Here everything is static.
  */
 #include "State.h"
-#include "TimeModeSelector.h"
+#include "ModeSelector.h"
 #include "Editor.h"
 #include "TimeEditor.h"
 #include "CharEditor.h"
@@ -13,9 +13,16 @@
 #include "CalibrationPrompt.h"
 #include "CalibrationTimeEditor.h"
 
+#ifdef FLAT_MODE
+#include "FlatModeSelector.h"
+#else
+
+#include "MultiModeSelector.h"
+
+#endif
+
 #ifdef BREW_BUTTON
     #include "BrewTimer.h"
-
 #endif
 
 class MillControl{
@@ -26,7 +33,11 @@ public:
     static const unsigned char DOUBLE_CLICK = 1;
     static const unsigned char LONG_CLICK = 2;
 
-    static TimeModeSelector         TIME_MODE_SELECTOR;
+#ifdef FLAT_MODE
+    static FlatModeSelector     TIME_MODE_SELECTOR;
+#else
+    static MultiModeSelector TIME_MODE_SELECTOR;
+#endif
     static Editor                   EDITOR;
     static TimeEditor               TIME_EDITOR;
     static CharEditor               CHAR_EDITOR;
@@ -42,8 +53,6 @@ public:
     static void setup();
     static void loop();
     static State* getState();
-
-    static void redraw();
 
     static void open(State &newState);
     static void start(State &newState, bool open = false);

@@ -19,7 +19,7 @@ public:
     virtual void encoderChanged(int encoderPos) override;
 
 #ifdef DEBUG
-    virtual char*  getClassName() {return "TimeEditor"; }
+    virtual char*  getClassName() {return (char *) "TimeEditor"; }
 #endif
 };
 

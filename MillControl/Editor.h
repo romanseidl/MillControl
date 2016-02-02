@@ -1,9 +1,9 @@
 #pragma once
 
-#include "TimeMode.h"
+#include "Mode.h"
 #include "State.h"
 
-class TimeModeSelector;
+class MultiModeSelector;
 
 class Editor : public State {
     int position = 0;
@@ -18,8 +18,8 @@ class Editor : public State {
 
     bool deleteMode = false;
 
-    TimeMode* timeMode;
-    TimeModeList* timeModes;
+    Mode *timeMode;
+    ModeList *timeModes;
 public:
     virtual bool start() override;
     virtual void stop() override;
@@ -38,7 +38,7 @@ public:
     void drawEditor();
 
 #ifdef DEBUG
-    virtual char*  getClassName() {return "Editor"; }
+    virtual char*  getClassName() {return (char *) "Editor"; }
 #endif
 };
 

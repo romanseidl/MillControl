@@ -11,8 +11,7 @@
  * define in UI.h
  *
  * Dependencies:
- * - ClickButton - https://code.google.com/p/clickbutton/
- * - Encoder (v1.2) - http://www.pjrc.com/teensy/td_libs_Encoder.html
+ * - Encoder (v1.4) - http://www.pjrc.com/teensy/td_libs_Encoder.html
  * - TimerOne (v1.1) - https://github.com/PaulStoffregen/TimerOne
  * - U8Glib - https://github.com/olikraus/u8glib
  *
@@ -33,14 +32,36 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
  */
 
-#include "State.h"
 #include "MillControl.h"
+#include <TimerOne.h>
 
 //=================================================
 // ENCODER - has two pins
-// only change pins if necessary, 2&3 have hardware interrupts and are thus faster!
+// only change pins if necessary, som pins have hardware interrupts and are thus faster
+// on most platforms do NOT use pin 13 (led pin)
 
-RotatingEncoder UI::encoder(2, 3);
+// Pins with HW-interrupts for different boards (s. http://www.pjrc.com/teensy/td_libs_Encoder.html)
+// Teensy 3.0	All Digital Pins
+// Teensy 2.0	5, 6, 7, 8	11
+// Teensy 1.0	0, 1, 2, 3, 4, 6, 7, 16
+// Teensy++ 2.0	0, 1, 2, 3, 18, 19, 36, 37	6
+// Teensy++ 1.0	0, 1, 2, 3, 18, 19, 36, 37
+// Arduino Due	All Digital Pins
+// Arduino Uno	2, 3
+// Arduino Leonardo	0, 1, 2, 3
+// Arduino Mega	2, 3, 18, 19, 20, 21
+// Sanguino	2, 10, 11
+
+//Default for Ardiuno Pro Micro and Uno
+Rotator *UI::rotator = new RotatingEncoder(2, 3);
+
+//Default for Ardiuno Pro Micro and Uno when using spi (they are on pin 2 & 3)
+//Rotator* UI::rotator = new RotatingEncoder(0, 1);
+
+//Button Encoder - up and down button
+//Rotator* UI::rotator = new RotatingButtons(2, 3);
+
+
 #define ENCODER_BUTTON 4
 
 //=================================================
@@ -58,7 +79,9 @@ const unsigned char UI::PAUSE_TIME = 5;
 // Brew timer Timeout
 // when in the main selector (time mode selector) and the brew timer is active
 // after the given amount of milliseconds until the brew timer is shown again if it was interrupted
+#ifdef BREW_TIMER
 const long UI::BREW_TIMER_TIMEOUT = 3000;
+#endif
 
 //=================================================
 // Display
@@ -73,9 +96,15 @@ const long UI::BREW_TIMER_TIMEOUT = 3000;
 #define OLED_CS 10   // also called: SS, ST, CE
 #define OLED_MOSI 11 // also called: SDA, SID, Din
 #define OLED_MISO 9  // also called: a0, D/C,  DC, RS
-#define OLED_SCK 13  // also called: CLK, SCL
+#define OLED_SCK 13  // also called: CLK, SCL, SCLK
 
-
+// Pro Micro settings:
+/*#define OLED_RESET 8 // also called: RES, RST
+#define OLED_CS 10   // also called: SS, ST, CE
+#define OLED_MOSI 16 // also called: SDA, SID, Din
+#define OLED_MISO 9  // also called: a0, D/C,  DC, RS
+#define OLED_SCK 15  // also called: CLK, SCL, SCLK
+*/
 //=================================================
 // SSD 1306 Display
 
@@ -112,7 +141,7 @@ U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64_2X(U8G_I2C_OPT_NO_ACK);
   const u8g_fntpgm_uint8_t* UI::FONT_REGULAR{u8g_font_helvB14r};
   const u8g_fntpgm_uint8_t* UI::FONT_LARGE_NUMERIC{u8g_font_fub20n};
   const unsigned char UI::BORDER_WIDTH = 2;
-  
+
   const unsigned char UI::LINE_HEIGHT = 14;
   const unsigned char UI::SMALL_LINE_HEIGHT = 10;
   const unsigned char UI::LARGE_LINE_HEIGHT = 20;
@@ -127,7 +156,7 @@ U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64_2X(U8G_I2C_OPT_NO_ACK);
   const u8g_fntpgm_uint8_t* UI::FONT_SMALL{u8g_font_6x12r};
   const u8g_fntpgm_uint8_t* UI::FONT_NUMERIC{u8g_font_helvR08n};
   const u8g_fntpgm_uint8_t* UI::FONT_REGULAR{u8g_font_helvB08r};
-  const u8g_fntpgm_uint8_t* UI::FONT_LARGE_NUMERIC{u8g_font_helvB14n};  
+  const u8g_fntpgm_uint8_t* UI::FONT_LARGE_NUMERIC{u8g_font_helvB14n};
   const unsigned char UI::LINE_HEIGHT = 8;
   const unsigned char UI::SMALL_LINE_HEIGHT = 6;
   const unsigned char UI::LARGE_LINE_HEIGHT = 14;
@@ -148,14 +177,17 @@ Button UI::encoderButton(ENCODER_BUTTON, Button::SINGLE_CLICK);
 #endif
 
 void setup() {
+    //Timer1.initialize(1000000l);
 #ifdef PORTRAIT_DISPLAY
     //Rotate the screen
     UI::u8g.setRot90();
 #endif
+//UI::u8g.setRot270();
+
 #ifdef DEBUG
     Serial.begin(9600);
-    DEBUG_PRINTLN("Setup");
 #endif
+    MultiTimer1::start();
     MillControl::setup();
     DEBUG_PRINTLN("Setup completed");
 }

@@ -15,7 +15,7 @@ bool CalibrationRun::open() {
 
 void CalibrationRun::loop() {
 #ifdef MILL_BUTTON
-    if(UI::millButton.depressed())
+    if (!UI::millButton.isPressed())
         encoderClick();
 #endif
 

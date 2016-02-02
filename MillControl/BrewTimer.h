@@ -29,7 +29,7 @@ public:
     virtual bool open() override;
 
 #ifdef DEBUG
-    virtual char*  getClassName() {return "BrewTimer"; }
+    virtual char*  getClassName() {return (char *) "BrewTimer"; }
 #endif
 };
 

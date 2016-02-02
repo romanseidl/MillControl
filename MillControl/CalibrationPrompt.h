@@ -27,7 +27,7 @@ public:
     int *getTime();
 
 #ifdef DEBUG
-    virtual char*  getClassName() {return "CalibrationPrompt"; }
+    virtual char*  getClassName() {return (char *) "CalibrationPrompt"; }
 #endif
 };
 

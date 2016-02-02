@@ -1,34 +1,36 @@
 #pragma once
 
-#include "ClickButton.h" // https://code.google.com/p/clickbutton/
+#include "MultiTimer1.h"
 
-class Button {
-    unsigned char clicks = 0;
-    ClickButton button;
-//Can handle up to four buttons - change to allow for more
-    static const unsigned char MAX_BUTTONS = 4;
-    static const int CLICK_TIME_SHORT = 100;
-    static const int CLICK_TIME_DOUBLE = 500;
+class Button : public Timed {
+    char clicks = 0; //clicks if any since the last getClicks();
+
+    //Can handle up to four buttons - change to allow for more
+    static const int DEBOUNCE_TIME = 30; //Milliseconds to wait for a stable state
+    static const int CLICK_TIME_MULTI = 500;
     static const int CLICK_TIME_LONG = 1000;
-public:
-    static Button *buttons[];
-    static unsigned char n_buttons;
 
+    unsigned char pin;        // Arduino pin connected to the button
+    bool multiClick;          // Is this a multi-click button?
+
+    bool lastState = false;   // previous button reading
+    bool stableState = false;// the currently debounced button (press) state
+
+    char clickCount = 0;      // Number of button clicks within a CLICK_TIME_MULTI
+    long lastBounceTime = 0;  // the last time the button input pin was toggled, due to noise or a press
+public:
     static const bool SINGLE_CLICK = false;
     static const bool MULTI_CLICK = true;
-    static void updateButtons();
 
-    Button(unsigned char, bool);
+    Button(unsigned char, bool = false);
 
-    void update();
+    void setMultiClick(bool _multiClick);
 
-    unsigned char getClicks();
+    void run() override;
 
-    void setSingleClickButton();
+    char getClicks();
 
-    void setMultiClickButton();
-
-    bool depressed();
+    bool isPressed();
 };
 
 

@@ -3,16 +3,16 @@
 #pragma once
 
 #include "State.h"
-#include "TimeMode.h"
+#include "Mode.h"
 
 class Run : public State {
 
-    static const unsigned char ON = LOW;
-    static const unsigned char OFF = HIGH;
+    static const unsigned char PROGMEM ON = LOW;
+    static const unsigned char PROGMEM OFF = HIGH;
 
-    static const unsigned char TIMED_RUN = 0;
-    static const unsigned char STOP_RUN = 1;
-    static const unsigned char HOLD_RUN = 2;
+    static const unsigned char PROGMEM TIMED_RUN = 0;
+    static const unsigned char PROGMEM STOP_RUN = 1;
+    static const unsigned char PROGMEM HOLD_RUN = 2;
 
 
     unsigned char runType;
@@ -20,20 +20,18 @@ class Run : public State {
     unsigned long stopTime;
     unsigned long updateTime;
     unsigned long pauseTime;
-    int runDeciSeconds;
+
+    int run_data;
     int lastEncoderPos;
 
-    TimeMode *timeMode;
-
-    unsigned char runTime = 0;
-
+    unsigned char run_icon;
 public:
     void stopMill() const;
     void startMill() const;
 
     Run();
 
-    void setMode(unsigned char);
+    void setMode(unsigned char _run_icon, int _run_data, bool hold);
 
     virtual bool start() override;
 
@@ -46,7 +44,8 @@ public:
     virtual void encoderClick() override;
 
 #ifdef BREW_BUTTON
-    virtual void brewClick() override;
+
+    virtual void brewClick();
 #endif
 
 protected:
@@ -55,6 +54,7 @@ protected:
     virtual void draw() override;
 
 #ifdef DEBUG
-    virtual char*  getClassName() {return "Run"; }
+    virtual char*  getClassName() {return (char *) "Run"; }
 #endif
+
 };

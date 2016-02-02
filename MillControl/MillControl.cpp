@@ -3,8 +3,15 @@
 //
 #include "MillControl.h"
 
+#ifdef FLAT_MODE
 
-TimeModeSelector        MillControl::TIME_MODE_SELECTOR;
+#include "FlatModeSelector.h"
+
+FlatModeSelector  MillControl::TIME_MODE_SELECTOR;
+#else
+MultiModeSelector MillControl::TIME_MODE_SELECTOR;
+#endif
+
 Editor                  MillControl::EDITOR;
 TimeEditor              MillControl::TIME_EDITOR;
 CharEditor              MillControl::CHAR_EDITOR;
@@ -14,7 +21,7 @@ CalibrationPrompt       MillControl::CALIBRATION_PROMPT;
 CalibrationTimeEditor   MillControl::CALIBRATION_TIME_EDITOR;
 
 #ifdef BREW_BUTTON
-    BrewTimer               MillControl::BREW_TIMER;
+BrewTimer               MillControl::BREW_TIMER;
 #endif
 
 State *MillControl::state = &TIME_MODE_SELECTOR;
@@ -24,7 +31,7 @@ void MillControl::setup() {
     state->redraw();
 }
 
-#ifdef DEBUG
+#ifdef aDEBUG
 #define STACK() {\
         DEBUG_PRINTLN("Stack:");\
         State *s = state; \
@@ -44,16 +51,16 @@ void MillControl::close(State *closeState) {
     DEBUG_PRINTLN(closeState->getClassName());
 
     closeState->stop();
-    if(remove(closeState) != NULL) {
-        if(state->start())
-           state->redraw();
+    if (remove(closeState) != NULL) {
+        if (state->start())
+            state->redraw();
         else
             close(state);
     };
     STACK();
 }
 
-State * MillControl::remove(State *find) {
+State *MillControl::remove(State *find) {
     DEBUG_PRINT("remove: ");
     DEBUG_PRINTLN(find->getClassName());
 
@@ -64,7 +71,7 @@ State * MillControl::remove(State *find) {
         State *before = state;
         while (before != NULL && before->previousState != find)
             before = before->previousState;
-        if(before != NULL)
+        if (before != NULL)
             before->previousState = find->previousState;
         return NULL;
     }
@@ -78,11 +85,11 @@ void MillControl::openInBackground(State &newState) {
     DEBUG_PRINT("openInBackground: ");
     DEBUG_PRINTLN(newState.getClassName());
     bool opened = newState.open();
-    if(opened) {
+    if (opened) {
         //Insert state behind top
         remove(&newState);
         newState.previousState = state->previousState;
-        state->previousState  = &newState;
+        state->previousState = &newState;
         STACK();
     }
 }
@@ -102,14 +109,14 @@ void MillControl::start(State &newState, bool open) {
     state = &newState;
 
     bool started;
-    if(!open){
+    if (!open) {
         started = newState.start();
     } else {
         started = newState.open();
     }
 
     //Do I need this Idea of a state not starting?
-    if(started) {
+    if (started) {
         //redraw
         state->redraw();
     } else {
@@ -130,22 +137,23 @@ void MillControl::loop() {
 
 #ifdef MILL_BUTTON
     const char millClicks = UI::millButton.getClicks();
-    #ifdef MILL_BUTTON_2
-        const char mill2Clicks = UI::millButton2.getClicks();
-    #endif
+#ifdef MILL_BUTTON_2
+    const char mill2Clicks = UI::millButton2.getClicks();
+#endif
 #else
     const char millClicks = UI::encoderButton.getClicks();
 #endif
 
     if (millClicks != 0) {
+        DEBUG_PRINTLN(millClicks);
 #ifdef MILL_BUTTON
         state->millClick(millClicks > 0 ? (millClicks == 1 ? CLICK : DOUBLE_CLICK) : LONG_CLICK);
     }
-    #ifdef MILL_BUTTON_2
+#ifdef MILL_BUTTON_2
     else if (mill2Clicks != 0) {
-            state->millClick(mill2Clicks > 0 ? DOUBLE_CLICK : LONG_CLICK);
+        state->millClick(mill2Clicks > 0 ? DOUBLE_CLICK : LONG_CLICK);
     }
-    #endif
+#endif
     else if (UI::encoderButton.getClicks() != 0) {
         state->encoderClick();
     }
@@ -166,22 +174,17 @@ void MillControl::loop() {
     }
 #endif
 #ifdef BREW_BUTTON
-    // Only the long click is used
-    else if (brewClicks < 0) {
-        DEBUG_PRINTLN("brewClick()");
+        // Only the long click is used
+    else if (brewClicks != 0) {
+        DEBUG_PRINTLN("loop::brewClick()");
         state->brewClick();
     }
 #endif
-    else if (UI::encoder.updated()) {
-        state->encoderChanged(UI::encoder.getPosition());
+    else if (UI::rotator->updated()) {
+        state->encoderChanged(UI::rotator->getPosition());
     } else
         state->loop();
+
 }
-
-
-State *MillControl::getState() {
-    return state;
-}
-
 
 
