@@ -54,12 +54,14 @@ void Run::stop() {
 #else
     UI::encoderButton.setMultiClick(true);
 #endif
-    UI::u8g.begin(); //resetting display - might help if there is interferences with the mill switch
 }
 
 void Run::startMill() const { digitalLow(UI::RELAY_PIN); }
 
-void Run::stopMill() const { digitalHigh(UI::RELAY_PIN); }
+void Run::stopMill() const {
+    digitalHigh(UI::RELAY_PIN);
+    UI::u8g.begin(); //resetting display - might help if there is interferences with the mill switch
+}
 
 bool Run::start() {
     pauseTime = 0;
@@ -172,5 +174,3 @@ void Run::encoderChanged(int encoderPos) {
 void Run::brewClick() {
     MillControl::openInBackground(MillControl::BREW_TIMER);
 }
-
-#endif
