@@ -55,13 +55,6 @@ A run can be stopped any time by pressing the button used to start the run. For 
 I prefer a old school schmatic style over those fanzy fritzing pictures. Still I added them below in case you prefer them. 
 [![Schematic](https://raw.githubusercontent.com/romanseidl/MillControl/gh-pages/sketch/schematic.png)](https://raw.githubusercontent.com/romanseidl/MillControl/gh-pages/sketch/schematic.pdf)
 
-###Breadboard View
-#####Real Breadboard
-![Real Breadboard](https://raw.githubusercontent.com/romanseidl/MillControl/gh-pages/pictures/breadboard.JPG)
-_(There are two resistors to pull up the ports for the switches, I needed them before I activated the internal pull up resistors.)_
-#####Graphics
-[![Breadboard](https://raw.githubusercontent.com/romanseidl/MillControl/gh-pages/sketch/Breadboard_S.png)](https://raw.githubusercontent.com/romanseidl/MillControl/gh-pages/sketch/Breadboard.png)
-
 ###(c) 2015 by Roman Seidl
 
 This program is free software; you can redistribute it and/or modify
