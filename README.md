@@ -1,6 +1,10 @@
 # MillControl
 ##Arduino Coffee Grinder Control
 
+###THIS DESCRIPTION IS A BIT OUT OF DATE I WILL UPDATE IT WHEN I GET TO IT. 
+If you speak german please refer to: 
+https://www.kaffee-netz.de/threads/millcontrol-arduino-muehlensteuerung-mit-timer-gewichtsautomatik-und-brew-timer.95553/
+
 This was designed to build a timer controlled coffe grinder out of any regular machine. It was developed to be used with a Graef CM 70 but it should work fine with any brand or model.
 
 ###Requirements
@@ -50,13 +54,6 @@ A run can be stopped any time by pressing the button used to start the run. For 
 ###Schematic
 I prefer a old school schmatic style over those fanzy fritzing pictures. Still I added them below in case you prefer them. 
 [![Schematic](https://raw.githubusercontent.com/romanseidl/MillControl/gh-pages/sketch/schematic.png)](https://raw.githubusercontent.com/romanseidl/MillControl/gh-pages/sketch/schematic.pdf)
-
-###Breadboard View
-#####Real Breadboard
-![Real Breadboard](https://raw.githubusercontent.com/romanseidl/MillControl/gh-pages/pictures/breadboard.JPG)
-_(There are two resistors to pull up the ports for the switches, I needed them before I activated the internal pull up resistors.)_
-#####Graphics
-[![Breadboard](https://raw.githubusercontent.com/romanseidl/MillControl/gh-pages/sketch/Breadboard_S.png)](https://raw.githubusercontent.com/romanseidl/MillControl/gh-pages/sketch/Breadboard.png)
 
 ###(c) 2015 by Roman Seidl
 
