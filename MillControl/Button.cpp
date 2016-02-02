@@ -1,5 +1,3 @@
-#pragma once
-
 /**
  * Partly based on raron's (raronzen@gmail.com) clickbutton library.
  *
