@@ -1,3 +1,6 @@
+#include "ScaleTarePrompt.h"
+#include "MillControl.h"
+
 #ifdef SCALE
 
 bool ScaleTarePrompt::open() {

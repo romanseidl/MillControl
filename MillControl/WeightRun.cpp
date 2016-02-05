@@ -1,3 +1,6 @@
+#include "WeightRun.h"
+#include "MillControl.h"
+
 #ifdef SCALE
 bool WeightRun::start() {
     calibration_data = &mode->calibration_data;
