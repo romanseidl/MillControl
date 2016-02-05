@@ -10,6 +10,7 @@
 
 #ifdef SCALE
 #include "WeightRun.h"
+#include "ScaleTarePrompt.h"
 #endif
 
 EEMEM unsigned char eeprom_time;

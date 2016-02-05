@@ -59,13 +59,13 @@
 // Sanguino	2, 10, 11
 
 //Default for Ardiuno Pro Micro and Uno
-Rotator *UI::rotator = new RotatingEncoder(2, 3);
+//Rotator *UI::rotator = new RotatingEncoder(2, 3);
 
 //Default for Ardiuno Pro Micro and Uno when using spi (they are on pin 2 & 3)
 //Rotator* UI::rotator = new RotatingEncoder(0, 1);
 
 //Button Encoder - up and down button
-//Rotator* UI::rotator = new RotatingButtons(2, 3);
+Rotator *UI::rotator = new RotatingButtons(2, 3);
 
 
 #define ENCODER_BUTTON 4

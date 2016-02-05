@@ -25,9 +25,7 @@
 #endif
 
 #ifdef SCALE
-
 #include "ScaleTarePrompt.h"
-
 #endif
 
 class MillControl{
