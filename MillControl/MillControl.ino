@@ -16,6 +16,7 @@
  * - U8Glib - https://github.com/olikraus/u8glib
  *
  * (c) 2015 by Roman Seidl
+ * The bean and hand symbols (c) by @mamu - www.kaffee-netz.de
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
