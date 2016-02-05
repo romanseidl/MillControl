@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MILLCONTROL_MULTITIMER1_H
+#define MILLCONTROL_MULTITIMER1_H
 
 #include "Timed.h"
 
@@ -18,4 +19,4 @@ public:
     static void start();
 };
 
-
+#endif //MILLCONTROL_MULTITIMER1_H

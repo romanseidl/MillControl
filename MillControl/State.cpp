@@ -1,9 +1,5 @@
-
 #include "State.h"
 #include "MillControl.h"
-
-//--------------------------------------------------------------------------------
-// State
 
 void State::redraw() {
     DEBUG_PRINTLN("redraw()");

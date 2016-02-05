@@ -1,8 +1,9 @@
-#pragma once
+#ifndef MILLCONTROL_ROTATINGBUTTONS_H
+#define MILLCONTROL_ROTATINGBUTTONS_H
 
-#include <ClickButton.h>
 #include "Rotator.h"
 #include "Button.h"
+#include "Timed.h"
 
 class RotatingButtons : public Rotator, Timed {
 
@@ -28,3 +29,4 @@ private:
 
 };
 
+#endif //MILLCONTROL_ROTATINGBUTTONS_H

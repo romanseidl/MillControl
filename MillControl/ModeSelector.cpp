@@ -50,11 +50,3 @@ void ModeSelector::loop() {
 void ModeSelector::eepromWrite() {
     eeprom_write_byte(&eeprom_time_mode, (uint8_t) selectedMode);
 }
-
-#ifdef BREW_BUTTON
-
-void ModeSelector::brewClick() {
-    State::brewClick();
-}
-
-#endif

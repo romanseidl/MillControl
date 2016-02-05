@@ -1,11 +1,12 @@
-#pragma once
+#ifndef MILLCONTROL_EDITOR_H
+#define MILLCONTROL_EDITOR_H
 
-#include "Mode.h"
 #include "State.h"
+#include "DataEditorData.h"
 
 class MultiModeSelector;
 
-class Editor : public State {
+class Editor : public State, public DataEditorData {
     int position = 0;
 
     unsigned char back = 0;
@@ -30,12 +31,17 @@ public:
 
     virtual void draw();
 
-    int *getTime();
     char *getChar();
 
-    void drawEditPoint(unsigned char p, const unsigned char pos, const char *symbol) const;
+    virtual int *getData() override;
+
+    virtual void drawEditor() override;
+
+private:
+
+    void drawEditPoint(const unsigned char p, const unsigned char pos, const unsigned char symbol) const;
+
     void draw(bool editor);
-    void drawEditor();
 
 #ifdef DEBUG
     virtual char*  getClassName() {return (char *) "Editor"; }
@@ -43,3 +49,4 @@ public:
 };
 
 
+#endif //MILLCONTROL_EDITOR_H

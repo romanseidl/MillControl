@@ -16,31 +16,28 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
  */
 
+#include <Arduino.h>
 #include "Button.h"
-#include "UI.h"
 
-Button::Button(unsigned char _pin, bool _multiClick) {
-    pin = _pin;
-    multiClick = _multiClick;
-
+Button::Button(unsigned char pin, bool multiClick) : pin(pin), multiClick(multiClick) {
     //Set pin to input
-    pinMode(pin, INPUT);
-    // Turn on internal pullup resistor
-    digitalWrite(pin, HIGH);
+    pinMode(pin, INPUT_PULLUP);
 
     MultiTimer1::add(this);
 }
 
 //Update clicks
 void Button::run() {
-    long now = (long) millis();      // get current time
+    long now = (long) millis();         // get current time
     bool btnState = !digitalRead(pin);  // current appearant button state
 
     // If the switch changed, due to noise or a button press, reset the debounce timer
     if (btnState != lastState) lastBounceTime = now;
 
     // debounce the button (Check if a stable, changed state has occured)
-    if ((now - lastBounceTime) > DEBOUNCE_TIME && btnState != stableState) {
+    const long delta = now - lastBounceTime;
+
+    if (btnState != stableState && delta > DEBOUNCE_TIME) {
         stableState = btnState;
         //if the button was pressed then this is one more click
         if (stableState)
@@ -49,16 +46,16 @@ void Button::run() {
 
     if (multiClick) {
         // If the button is released and the pause was long enough then report the number of clicks and restart
-        if (!stableState && (now - lastBounceTime) > CLICK_TIME_MULTI) {
+        if (!stableState && delta > CLICK_TIME_MULTI) {
             // positive count for released buttons
             clicks = clickCount;
             clickCount = 0;
         }
 
         // Check for "long click"
-        if (stableState && (now - lastBounceTime > CLICK_TIME_LONG)) {
+        if (stableState && (delta > CLICK_TIME_LONG)) {
             // negative count for long clicks
-            clicks = 0 - clickCount;
+            clicks = -clickCount;
             clickCount = 0;
         }
 
@@ -73,7 +70,7 @@ void Button::run() {
 
 //Pulls clicks - resets the counter
 char Button::getClicks() {
-    char c = clicks;
+    const char c = clicks;
     clicks = 0;
     return c;
 }

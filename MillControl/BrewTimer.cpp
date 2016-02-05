@@ -59,7 +59,7 @@ void BrewTimer::encoderClick() {
     MillControl::start(*previousState);
 }
 
-//Very simple for now
+//simple for now
 void BrewTimer::draw() {
     UI::u8g.setFont(UI::FONT_REGULAR);
 #ifdef PORTRAIT_DISPLAY
@@ -74,8 +74,6 @@ void BrewTimer::draw() {
     const char y = UI::DISPLAY_HEIGHT - 3 * UI::BORDER_WIDTH - 1;//57;
 #endif
     UI::drawRunTime(x, y, (millis() - startTime) / 1000);
-
-
 }
 
 #endif

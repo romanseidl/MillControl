@@ -1,59 +1,38 @@
-//==================================================================================================
-// RunMode
-#pragma once
+#ifndef MILLCONTROL_RUN_H
+#define MILLCONTROL_RUN_H
 
-#include "State.h"
 #include "Mode.h"
+#include "BrewlessState.h"
 
-class Run : public State {
+class Run : public BrewlessState {
+    unsigned long update_time = 0;
 
-    static const unsigned char ON = LOW;
-    static const unsigned char OFF = HIGH;
-
-    static const unsigned char TIMED_RUN = 0;
-    static const unsigned char STOP_RUN = 1;
-    static const unsigned char HOLD_RUN = 2;
-
-
-    unsigned char runType;
-
-    unsigned long stopTime;
-    unsigned long updateTime;
-    unsigned long pauseTime;
-
+    const unsigned char run_icon;
+protected:
     int run_data;
-    int lastEncoderPos;
-
-    unsigned char run_icon;
 public:
-    void stopMill() const;
-    void startMill() const;
+    Run(const unsigned char run_icon, const int run_data);
 
-    Run();
+    static void stopMill();
 
-    void setMode(unsigned char _run_icon, int _run_data, bool hold);
+    static void startMill();
 
     virtual bool start() override;
 
     virtual void stop() override;
 
-    virtual void millClick(unsigned char i) override;
-
-    virtual void encoderChanged(int encoderPos) override;
-
     virtual void encoderClick() override;
-
-#ifdef BREW_BUTTON
-    virtual void brewClick();
-#endif
-
-protected:
-    virtual void loop() override;
-
-    virtual void draw() override;
 
 #ifdef DEBUG
     virtual char*  getClassName() {return (char *) "Run"; }
 #endif
 
+    virtual void loop() override;
+
+    virtual void draw() override;
+
+protected:
+    virtual bool close() override;
 };
+
+#endif //MILLCONTROL_RUN_H

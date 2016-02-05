@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MILLCONTROL_BUTTON_H
+#define MILLCONTROL_BUTTON_H
 
 #include "MultiTimer1.h"
 
@@ -22,7 +23,7 @@ public:
     static const bool SINGLE_CLICK = false;
     static const bool MULTI_CLICK = true;
 
-    Button(unsigned char, bool = false);
+    Button(unsigned char, bool = SINGLE_CLICK);
 
     void setMultiClick(bool _multiClick);
 
@@ -33,4 +34,4 @@ public:
     bool isPressed();
 };
 
-
+#endif //MILLCONTROL_BUTTON_H

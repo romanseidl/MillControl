@@ -1,14 +1,9 @@
-#pragma once
+#ifndef MILLCONTROL_CHAREDITOR_H
+#define MILLCONTROL_CHAREDITOR_H
 
 #include "State.h"
 
-//==================================================================================================
-// EditTime State
-
 class CharEditor : public State {
-    static const char CHARACTERS[];
-    static const unsigned char CHARACTERS_COUNT;
-
     char *c;
 public:
 
@@ -25,4 +20,4 @@ public:
 #endif
 };
 
-
+#endif //MILLCONTROL_CHAREDITOR_H

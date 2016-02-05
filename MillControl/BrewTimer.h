@@ -1,7 +1,5 @@
-#pragma once
-//
-// Created by roman on 03.12.15.
-//
+#ifndef MILLCONTROL_BREWTIMER_H
+#define MILLCONTROL_BREWTIMER_H
 
 #include "State.h"
 
@@ -25,7 +23,6 @@ public:
 
     bool isRunning();
 
-
     virtual bool open() override;
 
 #ifdef DEBUG
@@ -34,3 +31,5 @@ public:
 };
 
 #endif
+
+#endif //MILLCONTROL_BREWTIMER_H

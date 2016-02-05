@@ -5,6 +5,12 @@
 #include <avr/eeprom.h>
 #include "FlatModeSelector.h"
 #include "MillControl.h"
+#include "TimedRun.h"
+#include "HoldRun.h"
+
+#ifdef SCALE
+#include "WeightRun.h"
+#endif
 
 EEMEM unsigned char eeprom_time;
 
@@ -40,15 +46,28 @@ void FlatModeSelector::encoderClick() {
 }
 
 void FlatModeSelector::millClick(unsigned char clickType) {
-    unsigned char runMode = (clickType == MillControl::DOUBLE_CLICK) ? MillControl::DOUBLE_CLICK : selectedTime;
-    int runTime = getMode().getDeciSeconds(runMode);
+    unsigned char run_index = (clickType == MillControl::DOUBLE_CLICK) ? MillControl::DOUBLE_CLICK : selectedTime;
+    Mode &mode = getMode();
+    const int data = mode.getDeciSeconds(run_index);
 
-    if (runTime) {
-        if (runTime == Mode::SPECIAL_DATA)
-            runMode = MillControl::LONG_CLICK;
+    if (data) {
+        Run *run;
 
-        MillControl::RUN.setMode(runMode, runTime, clickType == MillControl::LONG_CLICK);
-        MillControl::open(MillControl::RUN);
+        if (data == Mode::SPECIAL_DATA) {
+            if (clickType == MillControl::LONG_CLICK)
+                run = new HoldRun(MillControl::LONG_CLICK, data);
+            else
+                run = new DirectRun(MillControl::LONG_CLICK, data);
+        } else {
+#ifdef SCALE
+            if (mode.mode == Mode::SCALE_MODE)
+                run = new WeightRun(run_index, data, &mode);
+            else
+#endif
+            run = new TimedRun(run_index, data);
+        }
+
+        MillControl::open(*run);
     }
 }
 
@@ -109,7 +128,7 @@ void FlatModeSelector::draw() {
         UI::u8g.drawStr(x - UI::u8g.getStrWidth(c_t), y, c_t);
 
         UI::u8g.setFont(UI::FONT_SMALL);
-        UI::u8g.drawStr(x, y, mode.weightMode ? "g" : "s");
+        UI::u8g.drawStr(x, y, mode.isWeightMode() ? "g" : "s");
     }
 
 }

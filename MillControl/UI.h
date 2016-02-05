@@ -1,11 +1,14 @@
-#pragma once
+#ifndef MILLCONTROL_UI_H
+#define MILLCONTROL_UI_H
 
 #include "RotatingEncoder.h"
 #include "RotatingButtons.h"
 #include "Button.h"
-#include "State.h"
-
+#include "Scale.h"
 #include <U8glib.h>
+
+#include "helvB10s.h"
+#include "helvB14r.h"
 
 //=================================================
 // DEBUG
@@ -13,12 +16,12 @@
 
 //#define DEBUG
 #ifdef DEBUG
-    #include <HardwareSerial.h>
-    #define DEBUG_PRINTLN(message)  {Serial.println(message);Serial.flush();}
-    #define DEBUG_PRINT(message)  {Serial.print(message);Serial.flush();}
+#include <HardwareSerial.h>
+#define DEBUG_PRINTLN(message)  {Serial.println(message);Serial.flush();}
+#define DEBUG_PRINT(message)  {Serial.print(message);Serial.flush();}
 #else
-    #define DEBUG_PRINTLN(message)
-    #define DEBUG_PRINT(message)
+#define DEBUG_PRINTLN(message)
+#define DEBUG_PRINT(message)
 #endif
 
 //=================================================
@@ -55,8 +58,14 @@
 // Set this and flash once to reset data - don't forget to comment it out again!
 // You can usually also reset all data by deteling all pages
 
-#define RESET_MODE
+//#define RESET_MODE
 
+
+//=================================================
+// SCALE MODE
+// This is not implemented yet
+
+//#define SCALE
 
 //=================================================
 // SYMBOLS
@@ -93,11 +102,12 @@ public:
 
     static constexpr char *BREW_TITLE PROGMEM = (char *const) "Brewing";
     static constexpr char *CALIBRATION_TITLE PROGMEM = (char *const) "Calibration";
+    static constexpr char *TARE_TITLE PROGMEM = (char *const) "Tare";
 
-    static constexpr char *DEL_STRING PROGMEM = (char *const) "x";
-    static constexpr char *ADD_STRING PROGMEM = (char *const) "+";
-    static constexpr char *MOVE_LEFT_STRING PROGMEM = (char *const) "<";
-    static constexpr char *MOVE_RIGHT_STRING PROGMEM = (char *const) ">";
+    static const unsigned char DEL_STRING        PROGMEM = 'x';
+    static const unsigned char ADD_STRING        PROGMEM = '+';
+    static const unsigned char MOVE_LEFT_STRING  PROGMEM = '<';
+    static const unsigned char MOVE_RIGHT_STRING PROGMEM = '>';
     //=================================================
     // Relay Pin - change the pin if you want it to be somewhere else
     static const unsigned char RELAY_PIN = 7;
@@ -108,10 +118,10 @@ public:
     static const long BREW_TIMER_TIMEOUT = 1000;
 #endif
 
-    static const u8g_fntpgm_uint8_t* FONT_SMALL;
-    static const u8g_fntpgm_uint8_t* FONT_NUMERIC;
-    static const u8g_fntpgm_uint8_t* FONT_REGULAR;
-    static const u8g_fntpgm_uint8_t* FONT_LARGE_NUMERIC;
+    static const u8g_fntpgm_uint8_t *FONT_SMALL;
+    static const u8g_fntpgm_uint8_t *FONT_NUMERIC;
+    static const u8g_fntpgm_uint8_t *FONT_REGULAR;
+    static const u8g_fntpgm_uint8_t *FONT_LARGE_NUMERIC;
 
     static Button encoderButton;
 #ifdef MILL_BUTTON
@@ -126,6 +136,10 @@ public:
 #endif
     static Rotator *rotator;
 
+#ifdef SCALE
+    static Scale scale;
+#endif
+
     //Display object - defined below
     static U8GLIB u8g;
 
@@ -137,19 +151,43 @@ public:
     static const unsigned char SMALL_LINE_HEIGHT;
     static const unsigned char LARGE_LINE_HEIGHT;
 
+    //Menu Symbols
+    static const unsigned char SCALE_SYMBOL = SYMBOL_SCALE;
+    static const unsigned char BACK_SYMBOL = SYMBOL_BACK;
+    static const unsigned char OK_SYMBOL = SYMBOL_OK;
+
+    //Menu Symbols
+    static const unsigned char CHAR_BEGIN = REGULAR_BEGIN;
+    static const unsigned char CHAR_END = REGULAR_END;
+
     //Draw Routines
     static void drawSubtitle(const char *text);
+
     static void drawTitle(const char *title);
-    static void drawDirectionSymbol(const unsigned char x ,const unsigned char y, const unsigned char height, const bool back, const unsigned char weight = 1);
-    static void drawSymbol(unsigned char x, unsigned char y, unsigned char symbol, unsigned char line_height, const unsigned char border = 2, const unsigned char weight = 1);
+
+    static void drawDirectionSymbol(const unsigned char x, const unsigned char y, const unsigned char height,
+                                    const bool back, const unsigned char weight = 1);
+
+    static void drawSymbol(unsigned char x, unsigned char y, unsigned char symbol, unsigned char line_height,
+                           const unsigned char border = 2, const unsigned char weight = 1);
 
     static void drawLargeSymbol(const unsigned char x, const unsigned char y, const unsigned char symbol);
-    static void drawTimeLine(char line, const int data, unsigned char y, unsigned char x, unsigned char grams,
-                             const bool small, bool selected, bool editor);
-    static void drawRunTime(const unsigned char x, const unsigned char y, int seconds);
 
-    static void drawEditPoint(const unsigned char p, const bool active, const char *symbol);
+    static void drawTimeLine(char line, const int data, unsigned char y, unsigned char x, bool grams, const bool small,
+                             bool selected, bool editor);
+
+    static void drawRunTime(const unsigned char x, const unsigned char y, int seconds, bool small = false);
+
+    static void drawRunWeight(const unsigned char x, const unsigned char y, int weight, bool small = false,
+                              unsigned char line = 0);
+
+    static void drawEditPoint(const unsigned char p, const bool active, const unsigned char symbol);
 
     static void printData(char *c_t, const int data, const bool weightLine = false);
 
+    static void drawProgressBar(const double progress);
+
+    static void drawRunWeightLine(long weight, const unsigned char line);
 };
+
+#endif //MILLCONTROL_UI_H

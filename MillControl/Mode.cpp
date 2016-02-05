@@ -2,34 +2,49 @@
 #include <util/delay.h>
 #include "Mode.h"
 
-inline int Mode::secondsForGrams(int grams) const {
-    return min(MAX_DATA, (((long) grams * (long) centiSecondsPerGram) / 100l));
+int Mode::secondsForGrams(int grams) const {
+    return min(MAX_DATA, (((long) grams * (long) calibration_data) / 100l));
 }
 
-//changes the mode, true is for weight mode, false is for time mode
-void Mode::setWeightMode(bool newMode) {
-    if (weightMode != newMode) {
-        weightMode = newMode;
+int Mode::gramsForSeconds(int seconds) const {
+    //deciseconds to decigrams
+    //Reconsider rounding problems!
+    return min(MAX_DATA, ((long) seconds * 100l) / (long) calibration_data);
+}
 
-        for (unsigned char c = 0; c < DATA_PER_MODE; c++) {
-            //special data is not converted
-            if (data[c] != SPECIAL_DATA) {
-                if (weightMode) {
-                    //deciseconds to decigrams
-                    //Reconsider rounding problems!
-                    data[c] = min(MAX_DATA, ((long) data[c] * 100l) / (long) centiSecondsPerGram);
-                } else {
-                    //decigrams to deciseconds
-                    data[c] = secondsForGrams(data[c]);
+//converts to another mode
+void Mode::setMode(char newMode) {
+    if (mode != newMode) {
+        int (Mode::*converter)(int) const = NULL;
+
+        if (calibration_data < 0)
+            calibration_data = 70;
+
+        //Conversion needed?
+        if (newMode == TIME_MODE) {
+            converter = &Mode::secondsForGrams;
+        } else if (mode == TIME_MODE) {
+            converter = &Mode::gramsForSeconds;
+        }
+
+        if (converter != NULL) {
+            for (unsigned char c = 0; c < DATA_PER_MODE; c++) {
+                //special data is not converted
+                if (data[c] != SPECIAL_DATA) {
+                    data[c] = (*this.*converter)(data[c]);
                 }
             }
         }
+
+        if (newMode == SCALE_MODE)
+            calibration_data = 0;
+        mode = newMode;
     }
 }
 
 //Returns the seonds for the data
 int Mode::getDeciSeconds(unsigned char time) {
-    if (weightMode) {
+    if (mode == WEIGHT_MODE) {
         //data is decigrams -> deciseconds
         return secondsForGrams(data[time]);
     }
@@ -53,9 +68,9 @@ EEMEM int eeprom_time_mode_times[ModeList::MAX_MODES][Mode::DATA_PER_MODE];
 EEMEM unsigned char eeprom_time_mode_weight_modes[ModeList::MAX_MODES];
 EEMEM int eeprom_time_mode_centi_seconds_per_grams[ModeList::MAX_MODES];
 
-constexpr char *ModeList::INIT_NAMES[INIT_TEMPLATES];
-constexpr bool ModeList::INIT_WEIGHT_MODES[INIT_TEMPLATES];
-constexpr int ModeList::INIT_TIMES[INIT_TEMPLATES][3];
+constexpr char *ModeList::INIT_NAMES[4];
+constexpr char ModeList::INIT_WEIGHT_MODES[4];
+constexpr int ModeList::INIT_TIMES[4][3];
 
 ModeList::ModeList() {
     eepromRead();
@@ -69,8 +84,8 @@ Mode &ModeList::insertAfer(Mode &mode) {
     Mode &newMode = add(newPos);
 
     //Clone data
-    newMode.weightMode = mode.weightMode;
-    newMode.centiSecondsPerGram = mode.centiSecondsPerGram;
+    newMode.mode = mode.mode;
+    newMode.calibration_data = mode.calibration_data;
     for (unsigned char c = 0; c < Mode::DATA_PER_MODE; c++)
         newMode.data[c] = mode.data[c];
     strcpy(newMode.name, mode.name);
@@ -100,22 +115,17 @@ Mode &ModeList::add(unsigned char pos) {
         DEBUG_PRINTLN("t")
         //Initialize the name
         strcpy(timeModes[pos].name, INIT_NAMES[size]);
-        DEBUG_PRINTLN(INIT_NAMES[0])
-        DEBUG_PRINTLN(size)
-        DEBUG_PRINTLN(INIT_NAMES[size])
-        DEBUG_PRINTLN("--------------")
-        DEBUG_PRINTLN(timeModes[pos].name)
-        DEBUG_PRINTLN(F("x"))
 
         for (unsigned char c = strlen(timeModes[pos].name); c < Mode::MAX_CHARS; c++)
-            timeModes[pos].name[c] = 32;
+            timeModes[pos].name[c] = '@';
         timeModes[pos].name[Mode::MAX_CHARS] = 0;
 
         //initialize the data
         for (unsigned char c = 0; c < Mode::DATA_PER_MODE; c++)
             timeModes[pos].data[c] = INIT_TIMES[size][c];
 
-        timeModes[pos].weightMode = INIT_WEIGHT_MODES[size];
+        timeModes[pos].mode = INIT_WEIGHT_MODES[size];
+        timeModes[pos].calibration_data = timeModes[pos].mode == Mode::SCALE_MODE ? 0 : 70;
     }
 
     size++;
@@ -188,8 +198,8 @@ void ModeList::eepromRead() {
 #endif
         eeprom_read_block(&size, &eeprom_time_modes, sizeof(unsigned char));
         for (unsigned char c = 0; c < size; c++) {
-            timeModes[c].weightMode = eeprom_read_byte(&eeprom_time_mode_weight_modes[c]);
-            eeprom_read_block(&timeModes[c].centiSecondsPerGram, &eeprom_time_mode_centi_seconds_per_grams[c],
+            timeModes[c].mode = eeprom_read_byte(&eeprom_time_mode_weight_modes[c]);
+            eeprom_read_block(&timeModes[c].calibration_data, &eeprom_time_mode_centi_seconds_per_grams[c],
                               sizeof(int));
             eeprom_read_block(timeModes[c].name, eeprom_time_mode_names[c], Mode::MAX_CHARS + 1);
             eeprom_read_block(timeModes[c].data, eeprom_time_mode_times[c], Mode::DATA_PER_MODE * sizeof(int));
@@ -207,8 +217,8 @@ void ModeList::eepromWrite() {
     eeprom_update_block(&size, &eeprom_time_modes, sizeof(unsigned char));
 
     for (unsigned char c = 0; c < size; c++) {
-        eeprom_write_byte(&eeprom_time_mode_weight_modes[c], timeModes[c].weightMode);
-        eeprom_update_block(&timeModes[c].centiSecondsPerGram, &eeprom_time_mode_centi_seconds_per_grams[c],
+        eeprom_write_byte(&eeprom_time_mode_weight_modes[c], timeModes[c].mode);
+        eeprom_update_block(&timeModes[c].calibration_data, &eeprom_time_mode_centi_seconds_per_grams[c],
                             sizeof(int));
         eeprom_update_block(timeModes[c].name, &eeprom_time_mode_names[c], Mode::MAX_CHARS + 1);
         eeprom_update_block(timeModes[c].data, eeprom_time_mode_times[c], Mode::DATA_PER_MODE * sizeof(int));
@@ -216,4 +226,6 @@ void ModeList::eepromWrite() {
 }
 
 
-
+bool Mode::isWeightMode() const {
+    return !mode == TIME_MODE;
+}

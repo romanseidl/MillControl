@@ -1,11 +1,9 @@
-#pragma once
-//
-// Created by roman on 03.12.15.
-//
+#ifndef MILLCONTROL_WEIGHTCALIBRATONRUN_H
+#define MILLCONTROL_WEIGHTCALIBRATONRUN_H
 
-#include "State.h"
+#include "BrewlessState.h"
 
-class CalibrationRun : public State {
+class WeightCalibrationRun : public BrewlessState {
     unsigned long startTime = 0;
     unsigned long stopTime = 0;
     unsigned long updateTime = 0;
@@ -17,11 +15,6 @@ public:
 
     virtual void loop() override;
 
-#ifdef BREW_BUTTON
-
-    virtual void brewClick();
-#endif
-
     virtual void millClick(unsigned char i) override;
     virtual void encoderClick() override;
 
@@ -30,7 +23,8 @@ public:
     unsigned long getRunMillis();
 
 #ifdef DEBUG
-    virtual char*  getClassName() {return (char *) "CalibrationRun"; }
+    virtual char*  getClassName() {return (char *) "WeightCalibrationRun"; }
 #endif
 };
 
+#endif //MILLCONTROL_WEIGHTCALIBRATONRUN_H

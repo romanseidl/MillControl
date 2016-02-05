@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MILLCONTROL_MODESELECTOR_H
+#define MILLCONTROL_MODESELECTOR_H
 
 #include "State.h"
 #include "Mode.h"
@@ -26,12 +27,7 @@ protected:
 public:
 
 #ifdef BREW_BUTTON
-
     virtual void loop() override;
-
-    //This is a workaround as there seems to be a strange compiler bug with defines is includes
-    virtual void brewClick();
-
 #endif
 
 #ifdef DEBUG
@@ -39,4 +35,4 @@ public:
 #endif
 };
 
-
+#endif //MILLCONTROL_MODESELECTOR_H

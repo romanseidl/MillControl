@@ -1,33 +1,37 @@
-#pragma once
-//
-// Created by roman on 03.12.15.
-//
+#ifndef MILLCONTROL_CALIBRATIONPROMPT_H
+#define MILLCONTROL_CALIBRATIONPROMPT_H
 
-#include "State.h"
+#include "Prompt.h"
+#include "DataEditorData.h"
 
-class CalibrationPrompt : public State {
-    int deciGrams = 70;
-    int position = 0;
-
+class CalibrationPrompt : public Prompt, public DataEditorData {
 protected:
-    virtual void draw() override;
-
     void draw(bool editor);
 
 public:
-    virtual bool start() override;
+    CalibrationPrompt();
 
     virtual bool open() override;
 
+    virtual int *getData() override;
+
+    int weight = 70;
+private:
+    virtual void drawEditor() override;
+
     virtual void encoderClick() override;
 
-    virtual void encoderChanged(int encoderPos) override;
-    void drawEditor();
+    virtual void draw() override;
 
-    int *getTime();
+protected:
+
+
+public:
+    virtual void cancel() override;
 
 #ifdef DEBUG
     virtual char*  getClassName() {return (char *) "CalibrationPrompt"; }
 #endif
 };
 
+#endif //MILLCONTROL_CALIBRATIONPROMPT_H

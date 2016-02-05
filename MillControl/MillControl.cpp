@@ -5,24 +5,26 @@
 
 #ifdef FLAT_MODE
 
-#include "FlatModeSelector.h"
-
 FlatModeSelector  MillControl::TIME_MODE_SELECTOR;
 #else
 MultiModeSelector MillControl::TIME_MODE_SELECTOR;
 #endif
 
 Editor                  MillControl::EDITOR;
-TimeEditor              MillControl::TIME_EDITOR;
+DataEditor              MillControl::TIME_EDITOR(&MillControl::EDITOR);
 CharEditor              MillControl::CHAR_EDITOR;
-Run                     MillControl::RUN;
-CalibrationRun          MillControl::WEIGHT_CALIBRATOR;
+WeightCalibrationRun    MillControl::WEIGHT_CALIBRATOR;
 CalibrationPrompt       MillControl::CALIBRATION_PROMPT;
-CalibrationTimeEditor   MillControl::CALIBRATION_TIME_EDITOR;
+DataEditor              MillControl::CALIBRATION_TIME_EDITOR(&MillControl::CALIBRATION_PROMPT);
 
 #ifdef BREW_BUTTON
 BrewTimer               MillControl::BREW_TIMER;
 #endif
+
+#ifdef SCALE
+ScaleTarePrompt     MillControl::SCALE_CALIBRATOR;
+#endif
+
 
 State *MillControl::state = &TIME_MODE_SELECTOR;
 

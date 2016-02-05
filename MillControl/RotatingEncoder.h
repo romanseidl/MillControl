@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MILLCONTROL_ROTATINGENCODER_H
+#define MILLCONTROL_ROTATINGENCODER_H
 
 #include <Encoder.h>
 #include "Rotator.h"
@@ -20,3 +21,5 @@ class RotatingEncoder : public Rotator {
 
     virtual void setMode(int ticks, int pos) override;
 };
+
+#endif //MILLCONTROL_ROTATINGENCODER_H

@@ -1,10 +1,9 @@
-//
-// Created by roman on 24.11.15.
-//
-
 #include "MultiModeSelector.h"
 #include "MillControl.h"
-
+#include "TimedRun.h"
+#include "WeightRun.h"
+#include "DirectRun.h"
+#include "HoldRun.h"
 
 bool MultiModeSelector::start() {
     setEncoderMode(timeModes.size, selectedMode);
@@ -16,9 +15,24 @@ void MultiModeSelector::encoderClick() {
 }
 
 void MultiModeSelector::millClick(unsigned char clickType) {
-    if (getMode().getDeciSeconds(clickType)) {
-        MillControl::RUN.setMode(clickType, getMode().getDeciSeconds(clickType), clickType == 2);
-        MillControl::open(MillControl::RUN);
+    Mode &mode = getMode();
+    const int data = mode.getDeciSeconds(clickType);
+    if (data) {
+        Run *run;
+
+        if (data == Mode::SPECIAL_DATA) {
+            if (clickType == MillControl::LONG_CLICK)
+                run = new HoldRun(clickType, data);
+            else
+                run = new DirectRun(clickType, data);
+        } else {
+            if (mode.mode == Mode::SCALE_MODE)
+                run = new WeightRun(clickType, data, &mode);
+            else
+                run = new TimedRun(clickType, data);
+        }
+
+        MillControl::open(*run);
     }
 }
 
@@ -37,8 +51,8 @@ void MultiModeSelector::draw() {
 #ifndef PORTRAIT_DISPLAY
     unsigned char lines = 0;
     for (unsigned char t = 0; t < Mode::DATA_PER_MODE; t++) {
-        if(timeModes.timeModes[selectedMode].data[t] > 0)
-                lines++;
+        if (timeModes.timeModes[selectedMode].data[t] > 0)
+            lines++;
     }
 #endif
 
@@ -54,10 +68,14 @@ void MultiModeSelector::draw() {
                               line;   //52 + line*32
 #else
             unsigned char x = (UI::DISPLAY_WIDTH - UI::DISPLAY_HEIGHT - UI::LINE_HEIGHT) / 2 + UI::LINE_HEIGHT;
-            unsigned char y = lines > 2 ? ((UI::DISPLAY_HEIGHT- (UI::LINE_HEIGHT * 3)) / 6) + UI::LINE_HEIGHT + (((UI::DISPLAY_HEIGHT- (UI::LINE_HEIGHT *3)) / 3) + UI::LINE_HEIGHT ) * line :
-                                          ((UI::DISPLAY_HEIGHT- (UI::LINE_HEIGHT * 2)) / 4) + UI::LINE_HEIGHT + (((UI::DISPLAY_HEIGHT- (UI::LINE_HEIGHT *2)) / 2) + UI::LINE_HEIGHT ) * line; //lines > 2 ? 16 + line * 22 : 23 + line * 32;  //16 + line * 22 : 23 + line * 32  - 
+            unsigned char y = lines > 2 ? ((UI::DISPLAY_HEIGHT - (UI::LINE_HEIGHT * 3)) / 6) + UI::LINE_HEIGHT +
+                                          (((UI::DISPLAY_HEIGHT - (UI::LINE_HEIGHT * 3)) / 3) + UI::LINE_HEIGHT) * line
+                                        :
+                              ((UI::DISPLAY_HEIGHT - (UI::LINE_HEIGHT * 2)) / 4) + UI::LINE_HEIGHT +
+                              (((UI::DISPLAY_HEIGHT - (UI::LINE_HEIGHT * 2)) / 2) + UI::LINE_HEIGHT) *
+                              line; //lines > 2 ? 16 + line * 22 : 23 + line * 32;  //16 + line * 22 : 23 + line * 32  -
 #endif
-            UI::drawTimeLine(t, time, y, x, mode.weightMode, false, false, false);
+            UI::drawTimeLine(t, time, y, x, mode.mode, false, false, false);
             line++;
         }
     }

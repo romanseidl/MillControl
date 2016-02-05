@@ -8,6 +8,8 @@ project(${PROJECT_NAME})
 
 link_directories(/home/roman/sketchbook/libraries/U8glib)
 set(U8glib_RECURSE True)
+link_directories(/home/roman/sketchbook/libraries/Queuetue_HX711_Library/src)
+#set(U8glib_RECURSE True)
 link_directories(/home/roman/sketchbook/libraries/)
 
 

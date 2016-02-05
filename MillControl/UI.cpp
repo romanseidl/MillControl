@@ -1,9 +1,5 @@
-//
-// Created by roman on 21.12.15.
-//
+#include "TimedRun.h"
 
-#include "UI.h"
-#include "Mode.h"
 
 void UI::drawSubtitle(const char *text) {
 #ifdef PORTRAIT_DISPLAY
@@ -27,19 +23,21 @@ void UI::drawTitle(const char *title) {
 
 #ifdef DEBUG
     //Memory display
-    UI::u8g.setFont(u8g_font_u8glib_4);
+//    UI::u8g.setFont(u8g_font_u8glib_4);
     char mem_str[5];
 
     extern int __heap_start, *__brkval;
     int v;
     const int mem = (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
-
-    sprintf(mem_str, "%i", mem);
-    UI::u8g.drawStr(0, 20, mem_str);
+    Serial.begin(9600);
+    Serial.println(mem);
+    Serial.flush();
+//    sprintf(mem_str, "%i", mem);
+//    UI::u8g.drawStr(20, 20, mem_str);
 #endif
 }
 
-void UI::drawTimeLine(char line, const int data, unsigned char y, unsigned char x, unsigned char grams,
+void UI::drawTimeLine(char line, const int data, unsigned char y, unsigned char x, bool grams,
                       const bool small, bool selected, bool editor) {
     char c_t[6] = "";
     const bool weightLine = line == -1;
@@ -158,41 +156,90 @@ void UI::drawLargeSymbol(const unsigned char x, const unsigned char y, const uns
 
 }
 
+void UI::drawRunWeight(const unsigned char x, const unsigned char y, int weight, bool small, unsigned char line) {
 
-void UI::drawRunTime(const unsigned char x, const unsigned char y, int seconds) {
+    char c_t[6] = "";
+    if (weight < 1000)
+        sprintf(c_t, "%i.%i", weight / 10, weight % 10);
+    else
+        sprintf(c_t, "%i", weight / 10);
+
+    u8g.setFont(small ? UI::FONT_REGULAR : FONT_LARGE_NUMERIC);
+    u8g.drawStr(x - u8g.getStrWidth(c_t), y, c_t);
+
+    if (line) {
+        const char w = UI::u8g.getStrWidth(c_t);
+
+        if (line == 1)
+            UI::u8g.drawHLine(x - w, y + UI::BORDER_WIDTH, w);
+        else
+            UI::u8g.drawHLine(x - w, y + UI::BORDER_WIDTH, w + UI::SMALL_LINE_HEIGHT);
+    }
+
+    u8g.setFont(FONT_REGULAR);
+    u8g.drawStr(x, y, "g");
+}
+
+void UI::drawRunTime(const unsigned char x, const unsigned char y, int seconds, bool small) {
     char c_t[6] = "";
     sprintf(c_t, "%i", seconds);
-    u8g.setFont(FONT_LARGE_NUMERIC);
+    u8g.setFont(small ? UI::FONT_REGULAR : FONT_LARGE_NUMERIC);
     u8g.drawStr(x - u8g.getStrWidth(c_t), y, c_t);
 
     u8g.setFont(FONT_REGULAR);
     u8g.drawStr(x, y, "s");
 }
 
-void UI::drawEditPoint(const unsigned char p, const bool active, const char *symbol) {
+void UI::drawEditPoint(const unsigned char p, const bool active, const unsigned char symbol) {
 //    UI::u8g.setFont(UI::FONT_SMALL);
 #ifdef PORTRAIT_DISPLAY
-    const int x =
-            (DISPLAY_WIDTH / 6) * p + (p > 0 ? ((DISPLAY_WIDTH / 6) - u8g.getStrWidth(UI::MOVE_RIGHT_STRING)) : 0);
-    const int y = DISPLAY_HEIGHT - 2 * BORDER_WIDTH;
+    char c[2];
+    c[0] = UI::MOVE_RIGHT_STRING;
+    c[1] = 0;
+    const unsigned char x =
+            (DISPLAY_WIDTH / 6) * p + (p > 0 ? ((DISPLAY_WIDTH / 6) - u8g.getStrWidth(c)) : 0);
+    const unsigned char y = DISPLAY_HEIGHT - 2 * BORDER_WIDTH;
 #else
-    const int x = UI::DISPLAY_WIDTH - (p == 0 ? (2 * UI::SMALL_LINE_HEIGHT + UI::BORDER_WIDTH * 4) :
+    const unsigned char x = UI::DISPLAY_WIDTH - (p == 0 ? (2 * UI::SMALL_LINE_HEIGHT + UI::BORDER_WIDTH * 4) :
                                        (UI::SMALL_LINE_HEIGHT + UI::BORDER_WIDTH * 2));
-    const int y = p > 1 ? ((p - 1) * (UI::DISPLAY_HEIGHT - 2 * UI::SMALL_LINE_HEIGHT - 2 * UI::BORDER_WIDTH - 1) / 3 +
+    const unsigned char y = p > 1 ? ((p - 1) * (UI::DISPLAY_HEIGHT - 2 * UI::SMALL_LINE_HEIGHT - 2 * UI::BORDER_WIDTH - 1) / 3 +
                            UI::SMALL_LINE_HEIGHT) : UI::SMALL_LINE_HEIGHT;
 #endif
 
-    if (symbol)
-        u8g.drawStr(x, y, symbol);
-    else
-        drawDirectionSymbol((const unsigned char) (x + SMALL_LINE_HEIGHT / 2 - UI::BORDER_WIDTH), y, SMALL_LINE_HEIGHT,
-                            true);
+    char s[2];
+    s[0] = symbol;
+    s[1] = 0;
+    u8g.drawStr(x, y, s);
 
     if (active) {
-        unsigned char w = (unsigned char) (symbol ? u8g.getStrWidth(symbol) : SMALL_LINE_HEIGHT);
-        u8g.drawHLine(x, (u8g_uint_t) (y + 1), w);
+        u8g.drawHLine(x, (u8g_uint_t) (y + 1), u8g.getStrWidth(s));
     }
 }
+
+void UI::drawProgressBar(const double progress) {
+#ifdef PORTRAIT_DISPLAY
+    const unsigned char w = UI::DISPLAY_WIDTH * progress;
+    u8g.drawBox(0, UI::DISPLAY_HEIGHT - UI::BORDER_WIDTH * 2 - 1, w, UI::BORDER_WIDTH * 2);
+#else
+    const unsigned char w = (UI::DISPLAY_WIDTH - UI::LINE_HEIGHT * 2) * progress;
+    u8g.drawBox(UI::LINE_HEIGHT * 2, UI::DISPLAY_HEIGHT - UI::BORDER_WIDTH * 2 - 1, w, UI::BORDER_WIDTH * 2);
+#endif
+}
+
+void UI::drawRunWeightLine(long weight, const unsigned char line) {
+    weight = max(0, min(9999, weight));
+
+#ifdef PORTRAIT_DISPLAY
+    const char x = UI::DISPLAY_WIDTH - UI::SMALL_LINE_HEIGHT - UI::LINE_HEIGHT - UI::BORDER_WIDTH;
+    const char y = UI::DISPLAY_HEIGHT - 2 * UI::SMALL_LINE_HEIGHT - 1;
+    drawRunWeight(x, y, weight, true, line);
+#else
+    const char x = UI::DISPLAY_WIDTH - UI::LINE_HEIGHT - 1; //89
+    const char y = UI::DISPLAY_HEIGHT - 3 * UI::BORDER_WIDTH - 1;//57;
+    drawRunWeight(x, y, weight, false, line);
+#endif
+}
+
 
 //------------------------------------------
 // Symbols
@@ -250,7 +297,8 @@ Symbol UI::BREW_SYMBOL(24, 30, BREW_BITS);
 #ifdef MODE_SYMBOLS
 //Converted with GIMP
 
-#ifdef DISPLAY_128x64
+//Large Symbols not used for now
+#ifdef LARGE_SYMBOLS
 static const u8g_pgm_uint8_t HAND_BITS[] U8G_PROGMEM = {
    0x00, 0xe0, 0x0f, 0x00, 0x00, 0x00, 0xfc, 0x7f, 0x00, 0x00, 0x00, 0xff,
    0xff, 0x01, 0x00, 0x80, 0x1f, 0xf0, 0x07, 0x00, 0xe0, 0x07, 0xc0, 0x0f,
@@ -321,3 +369,5 @@ Symbol UI::SYMBOLS[]{Symbol(20, 20, BEAN_BITS), Symbol(20, 20, BEAN_BITS, 2), Sy
 #endif
 
 #endif
+
+

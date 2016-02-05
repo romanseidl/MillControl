@@ -1,8 +1,7 @@
-#pragma once
+#ifndef MILLCONTROL_MULTIMODESELECTOR_H
+#define MILLCONTROL_MULTIMODESELECTOR_H
 
-#include "State.h"
 #include "ModeSelector.h"
-
 
 class MultiModeSelector : public ModeSelector {
 
@@ -22,3 +21,4 @@ public:
 #endif
 };
 
+#endif //MILLCONTROL_MULTIMODESELECTOR_H

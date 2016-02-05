@@ -1,4 +1,6 @@
-#pragma once
+#ifndef MILLCONTROL_MILLCONTROL_H
+#define MILLCONTROL_MILLCONTROL_H
+
 /*
  * App Class
  * Here everything is static.
@@ -6,23 +8,26 @@
 #include "State.h"
 #include "ModeSelector.h"
 #include "Editor.h"
-#include "TimeEditor.h"
+#include "DataEditor.h"
 #include "CharEditor.h"
 #include "Run.h"
-#include "CalibrationRun.h"
+#include "WeightCalibrationRun.h"
 #include "CalibrationPrompt.h"
-#include "CalibrationTimeEditor.h"
 
 #ifdef FLAT_MODE
 #include "FlatModeSelector.h"
 #else
-
 #include "MultiModeSelector.h"
-
 #endif
 
 #ifdef BREW_BUTTON
     #include "BrewTimer.h"
+#endif
+
+#ifdef SCALE
+
+#include "ScaleTarePrompt.h"
+
 #endif
 
 class MillControl{
@@ -39,20 +44,22 @@ public:
     static MultiModeSelector TIME_MODE_SELECTOR;
 #endif
     static Editor                   EDITOR;
-    static TimeEditor               TIME_EDITOR;
+    static DataEditor TIME_EDITOR;
     static CharEditor               CHAR_EDITOR;
-    static CalibrationRun           WEIGHT_CALIBRATOR;
+    static WeightCalibrationRun WEIGHT_CALIBRATOR;
     static CalibrationPrompt        CALIBRATION_PROMPT;
-    static CalibrationTimeEditor    CALIBRATION_TIME_EDITOR;
-    static Run                  RUN;
+    static DataEditor CALIBRATION_TIME_EDITOR;
+
+#ifdef SCALE
+    static ScaleTarePrompt SCALE_CALIBRATOR;
+#endif
 
 #ifdef BREW_BUTTON
-    static BrewTimer            BREW_TIMER;
+    static BrewTimer BREW_TIMER;
 #endif
 
     static void setup();
     static void loop();
-    static State* getState();
 
     static void open(State &newState);
     static void start(State &newState, bool open = false);
@@ -64,3 +71,4 @@ public:
     static void openInBackground(State &newState);
 };
 
+#endif //MILLCONTROL_MILLCONTROL_H

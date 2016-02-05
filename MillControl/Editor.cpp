@@ -6,7 +6,7 @@ bool Editor::start() {
     //get all time modes - needed for adding and deleting
     timeModes = &MillControl::TIME_MODE_SELECTOR.timeModes;
 
-    firstChar = (unsigned char) (Mode::DATA_PER_MODE + (timeMode->weightMode ? 1 : 0));
+    firstChar = (unsigned char) (Mode::DATA_PER_MODE + (timeMode->mode == Mode::WEIGHT_MODE ? 1 : 0));
 
     const int size = timeModes->size;
 
@@ -51,11 +51,13 @@ bool Editor::start() {
 void Editor::stop() {
 }
 
-int *Editor::getTime() {
-    if (timeMode->weightMode) if (position == 0)
-        return &timeMode->centiSecondsPerGram;
-    else
-        return &timeMode->data[position - 1];
+int *Editor::getData() {
+    if (timeMode->mode == Mode::WEIGHT_MODE) {
+        if (position == 0)
+            return &timeMode->calibration_data;
+        else
+            return &timeMode->data[position - 1];
+    }
     else
         return &timeMode->data[position];
 }
@@ -79,7 +81,20 @@ void Editor::encoderClick() {
         }
         position = 0;
     } else if (position == gram) {
-        timeMode->setWeightMode(!timeMode->weightMode);
+        unsigned char new_mode;
+        switch (timeMode->mode) {
+            case Mode::TIME_MODE:
+                new_mode = Mode::WEIGHT_MODE;
+                break;
+#ifdef SCALE
+            case Mode::WEIGHT_MODE:
+                new_mode = Mode::SCALE_MODE;
+                break;
+#endif
+            default:
+                new_mode = Mode::TIME_MODE;
+        }
+        timeMode->setMode(new_mode);
         position = 0;
     } else if (position == add) {
         MillControl::TIME_MODE_SELECTOR.setMode(&timeModes->insertAfer(*timeMode));
@@ -111,8 +126,12 @@ void Editor::encoderClick() {
 
 //In Weight Mode rotator click starts the calibration mode
 void Editor::millClick(unsigned char i) {
-    if(timeMode->weightMode)
+    if (timeMode->mode == Mode::WEIGHT_MODE)
         MillControl::open(MillControl::WEIGHT_CALIBRATOR);
+#ifdef SCALE
+    else if (timeMode->mode == Mode::SCALE_MODE)
+        MillControl::open(MillControl::SCALE_CALIBRATOR);
+#endif
 #ifndef MILL_BUTTON
     else
         encoderClick();
@@ -136,11 +155,11 @@ void Editor::drawEditor() {
 
 void Editor::draw(bool editor) {
     State::draw();
-    unsigned char weightMode = timeMode->weightMode ? 1 : 0;
+    unsigned char weightMode = timeMode->mode == Mode::WEIGHT_MODE ? 1 : 0;
     for (char t = -weightMode; t < Mode::DATA_PER_MODE; t++) {
 
         const char pos = t + weightMode;
-        
+
 #ifdef PORTRAIT_DISPLAY
         unsigned char x = 0;
 #ifdef MILL_BUTTON
@@ -152,28 +171,33 @@ void Editor::draw(bool editor) {
         unsigned char y = UI::LINE_HEIGHT *2  + ((UI::DISPLAY_HEIGHT - (UI::LINE_HEIGHT * 5)) * 3 / 8) + (((UI::DISPLAY_HEIGHT - (UI::LINE_HEIGHT * 5)) * 2 / 8) + UI::LINE_HEIGHT) * pos;   //52 + line*32#endif
 #endif
 #else
-        unsigned char x = UI::LINE_HEIGHT*2;
+        unsigned char x = UI::LINE_HEIGHT * 2;
 #ifdef MILL_BUTTON
         const bool small = weightMode;
-        const unsigned char y = weightMode ? (((UI::DISPLAY_HEIGHT- (UI::SMALL_LINE_HEIGHT * 4)) / 8) + UI::SMALL_LINE_HEIGHT  + (((UI::DISPLAY_HEIGHT- (UI::SMALL_LINE_HEIGHT  *4)) / 4) + UI::SMALL_LINE_HEIGHT  ) * pos) :
-                                             (((UI::DISPLAY_HEIGHT- (UI::LINE_HEIGHT * 3)) / 6) + UI::LINE_HEIGHT + (((UI::DISPLAY_HEIGHT- (UI::LINE_HEIGHT *3)) / 3) + UI::LINE_HEIGHT ) * pos); //small ? (13 + pos * 16) : (16 + t * 22);
+        const unsigned char y = weightMode ? (((UI::DISPLAY_HEIGHT - (UI::SMALL_LINE_HEIGHT * 4)) / 8) +
+                                              UI::SMALL_LINE_HEIGHT +
+                                              (((UI::DISPLAY_HEIGHT - (UI::SMALL_LINE_HEIGHT * 4)) / 4) +
+                                               UI::SMALL_LINE_HEIGHT) * pos) :
+                                (((UI::DISPLAY_HEIGHT - (UI::LINE_HEIGHT * 3)) / 6) + UI::LINE_HEIGHT +
+                                 (((UI::DISPLAY_HEIGHT - (UI::LINE_HEIGHT * 3)) / 3) + UI::LINE_HEIGHT) *
+                                 pos); //small ? (13 + pos * 16) : (16 + t * 22);
 #else
         const bool small = false;
         const unsigned char y = weightMode ? (((UI::DISPLAY_HEIGHT - (UI::LINE_HEIGHT * 3)) / 6) + UI::LINE_HEIGHT + (((UI::DISPLAY_HEIGHT- (UI::LINE_HEIGHT *3)) / 3) + UI::LINE_HEIGHT ) * pos) :
                                              (((UI::DISPLAY_HEIGHT - (UI::LINE_HEIGHT * 2)) / 4) + UI::LINE_HEIGHT + (((UI::DISPLAY_HEIGHT- (UI::LINE_HEIGHT *2)) / 2) + UI::LINE_HEIGHT ) * pos); // y = weightMode ? (15 + pos * 22) : (23 + pos * 32);
 #endif
 #endif
-        const int data = (t == -1) ? timeMode->centiSecondsPerGram : timeMode->data[t];
+        const int data = (t == -1) ? timeMode->calibration_data : timeMode->data[t];
 
-        UI::drawTimeLine(t, data, y, x, weightMode, small, position == pos, editor);
+        UI::drawTimeLine(t, data, y, x, timeMode->mode != Mode::TIME_MODE, small, position == pos, editor);
     }
 
     UI::u8g.setFont(UI::FONT_SMALL);
-    
-    drawEditPoint(0, back, 0);
+
+    drawEditPoint(0, back, UI::BACK_SYMBOL);
 
     if (gram)
-        drawEditPoint(1, gram, weightMode ? "s" : "g");
+        drawEditPoint(1, gram, weightMode ? 'g' : (timeMode->mode == Mode::SCALE_MODE ? UI::SCALE_SYMBOL : 's'));
 
     if (add)
         drawEditPoint(2, add, UI::ADD_STRING);
@@ -212,8 +236,6 @@ void Editor::draw(bool editor) {
     }
 }
 
-void Editor::drawEditPoint(const unsigned char p, const unsigned char pos, const char *symbol) const {
+void Editor::drawEditPoint(const unsigned char p, const unsigned char pos, const unsigned char symbol) const {
     UI::drawEditPoint(p, pos == position, symbol);
 };
-
-

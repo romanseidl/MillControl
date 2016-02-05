@@ -1,11 +1,14 @@
-#pragma once
+#ifndef MILLCONTROL_STATE_H
+#define MILLCONTROL_STATE_H
 
 #include "UI.h"
+#include <stddef.h>
 
 class State {
 protected:
     void setEncoderMode(int, int);
-    bool close();
+
+    virtual bool close();
 
 public:
     State* previousState = NULL;
@@ -38,3 +41,4 @@ public:
 #endif
 };
 
+#endif //MILLCONTROL_STATE_H

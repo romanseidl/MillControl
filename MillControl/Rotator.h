@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MILLCONTROL_ROTATOR_H
+#define MILLCONTROL_ROTATOR_H
 
 class Rotator {
 
@@ -11,3 +12,5 @@ public:
 
     virtual void setMode(int, int);
 };
+
+#endif //MILLCONTROL_ROTATOR_H

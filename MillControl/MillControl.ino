@@ -35,6 +35,11 @@
 #include "MillControl.h"
 #include <TimerOne.h>
 
+#include "helvB14r.h"
+#include "helvB10s.h"
+#include "helvR14n.h"
+#include "fub20bn.h"
+
 //=================================================
 // ENCODER - has two pins
 // only change pins if necessary, som pins have hardware interrupts and are thus faster
@@ -68,6 +73,16 @@ Rotator *UI::rotator = new RotatingEncoder(2, 3);
 // BUTTONS
 
 //Buttons are in UI.h
+
+//=================================================
+// SCALE
+// to activate the scale uncomment the SCALE define in UI.h
+// Setup is scale(data_pin, clock_pin, power_pin) or scale(data_pin, clock_pin) if there is no power_pin
+
+#ifdef SCALE
+Scale UI::scale(A1, A2, A3);
+//Scale UI::scale(A1, A2); //without power pin
+#endif
 
 //=================================================
 // Pause time
@@ -136,10 +151,12 @@ U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64_2X(U8G_I2C_OPT_NO_ACK);
       const unsigned char UI::DISPLAY_WIDTH = 128;
       const unsigned char UI::DISPLAY_HEIGHT = 64;
   #endif
-  const u8g_fntpgm_uint8_t* UI::FONT_SMALL{u8g_font_helvB10r};
-  const u8g_fntpgm_uint8_t* UI::FONT_NUMERIC{u8g_font_helvR14n};
-  const u8g_fntpgm_uint8_t* UI::FONT_REGULAR{u8g_font_helvB14r};
-  const u8g_fntpgm_uint8_t* UI::FONT_LARGE_NUMERIC{u8g_font_fub20n};
+const u8g_fntpgm_uint8_t *UI::FONT_SMALL{helvB10s};
+const u8g_fntpgm_uint8_t *UI::FONT_NUMERIC{helvR14n};
+const u8g_fntpgm_uint8_t *UI::FONT_REGULAR{helvB14r};
+//const u8g_fntpgm_uint8_t* UI::FONT_REGULAR{helvB10s};
+const u8g_fntpgm_uint8_t *UI::FONT_LARGE_NUMERIC{fub20bn};
+//const u8g_fntpgm_uint8_t* UI::FONT_LARGE_NUMERIC{helvR14n};
   const unsigned char UI::BORDER_WIDTH = 2;
 
   const unsigned char UI::LINE_HEIGHT = 14;
@@ -177,12 +194,10 @@ Button UI::encoderButton(ENCODER_BUTTON, Button::SINGLE_CLICK);
 #endif
 
 void setup() {
-    //Timer1.initialize(1000000l);
 #ifdef PORTRAIT_DISPLAY
     //Rotate the screen
     UI::u8g.setRot90();
 #endif
-//UI::u8g.setRot270();
 
 #ifdef DEBUG
     Serial.begin(9600);

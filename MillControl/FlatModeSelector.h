@@ -1,8 +1,8 @@
-#pragma once
+#ifndef MILLCONTROL_FLATMODESELECTOR_H
+#define MILLCONTROL_FLATMODESELECTOR_H
 
 #include "State.h"
 #include "ModeSelector.h"
-
 
 class FlatModeSelector : public ModeSelector {
     unsigned char selectedTime = 0;
@@ -31,3 +31,4 @@ public:
 #endif
 };
 
+#endif //MILLCONTROL_FLATMODESELECTOR_H
