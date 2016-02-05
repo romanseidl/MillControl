@@ -1,9 +1,12 @@
 #include "MultiModeSelector.h"
 #include "MillControl.h"
 #include "TimedRun.h"
-#include "WeightRun.h"
 #include "DirectRun.h"
 #include "HoldRun.h"
+
+#ifdef SCALE
+#include "WeightRun.h"
+#endif
 
 bool MultiModeSelector::start() {
     setEncoderMode(timeModes.size, selectedMode);
@@ -26,9 +29,11 @@ void MultiModeSelector::millClick(unsigned char clickType) {
             else
                 run = new DirectRun(clickType, data);
         } else {
+#ifdef SCALE
             if (mode.mode == Mode::SCALE_MODE)
                 run = new WeightRun(clickType, data, &mode);
             else
+#endif
                 run = new TimedRun(clickType, data);
         }
 
