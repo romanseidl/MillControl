@@ -22,7 +22,7 @@ ModeSelector::ModeSelector() {
 bool ModeSelector::start() {
     //If there is only one button ensure it is multi-click
 #ifndef MILL_BUTTON
-    UI::encoderButton.setMultiClickButton();
+    UI::encoderButton.setMultiClick(true);
 #endif
     updateTime = millis();
     return true;

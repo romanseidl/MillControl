@@ -40,10 +40,8 @@ bool Editor::start() {
     DEBUG_PRINTLN("editor set up");
     //if there is no mill button i need a multi click button in the gram editor
 #ifndef MILL_BUTTON
-    if(timeMode->weightMode)
-        UI::encoderButton.setMultiClickButton();
-    else
-        UI::encoderButton.setSingleClickButton();
+    //Multi click if not in timed mode (for calibration menus)
+    UI::encoderButton.setMultiClick(timeMode->mode != Mode::TIME_MODE);
 #endif
     return true;
 }

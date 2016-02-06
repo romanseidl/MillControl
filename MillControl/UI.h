@@ -37,7 +37,7 @@
 
 // Comment out this line if there is no brew button
 // Change the Pin if you want it to be somewhere else
-#define BREW_BUTTON A0
+//#define BREW_BUTTON A0
 
 
 //=================================================
@@ -49,8 +49,6 @@
 //=================================================
 // FLAT MODE
 // In flat mode only one time per page is shown in the time mode selector.
-
-// Uncomment this to change the orientation to portrait mode
 //#define FLAT_MODE
 
 //=================================================
@@ -63,7 +61,6 @@
 
 //=================================================
 // SCALE MODE
-// This is not implemented yet
 
 //#define SCALE
 

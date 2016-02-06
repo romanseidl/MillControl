@@ -130,13 +130,13 @@ const long UI::BREW_TIMER_TIMEOUT = 3000;
 // You can either connect a SPI or a I2C display. SPI is much faster but may be a bit annoying to find th right pinout
 
 // i2c
-U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64_2X(U8G_I2C_OPT_NO_ACK);
+//U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64_2X(U8G_I2C_OPT_NO_ACK);
 
 // Software SPI
 //U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64_2X(OLED_SCK, OLED_MOSI, OLED_CS, OLED_MISO, OLED_RESET);
 
 // Hardware SPI (recommended, if not working try software spi)
-//U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64_2X(OLED_CS, OLED_MISO, OLED_RESET);
+U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64_2X(OLED_CS, OLED_MISO, OLED_RESET);
 
 //=================================================
 // PCD 8544 Display
