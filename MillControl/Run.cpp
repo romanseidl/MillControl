@@ -14,6 +14,7 @@ bool Run::start() {
     UI::encoderButton.setMultiClick(false);
 #endif
     startMill();
+    UI::u8g.begin(); //resetting display - might help if there is interferences with the mill switch
     return true;
 }
 
