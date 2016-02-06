@@ -9,11 +9,14 @@ bool WeightRun::start() {
     UI::scale.power_up();
     UI::scale.tare(50);
 
+    start_time = millis();
     return Run::start();
 }
 
 void WeightRun::loop() {
-    weight = max(0, UI::scale.get_floating_weight());
+    if (millis() - start_time > STARTUP_DELAY)
+        weight = max(0, UI::scale.get_floating_weight());
+
     if (weight > (run_data - *calibration_data)) {
         //Stop Mill etc.
         Run::close();
