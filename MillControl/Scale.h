@@ -4,7 +4,8 @@
 /**
  * HX 711 based scale
  * (c) 2016 by Roman Seidl
- * code partly based on code by ??? and on the Q2HX711 library by Scott Russell
+ * code partly based on code by @mamu at kaffee-netz.de and on the 
+ * Q2HX711 library by Scott Russell
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
