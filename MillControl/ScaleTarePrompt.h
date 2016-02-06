@@ -24,8 +24,6 @@ public:
 
 protected:
     virtual bool close() override;
-
-    void drawRunWeightLine();
 };
 
 #endif

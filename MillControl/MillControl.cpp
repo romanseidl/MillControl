@@ -54,8 +54,10 @@ void MillControl::close(State *closeState) {
 
     closeState->stop();
     if (remove(closeState) != NULL) {
-        if (state->start())
+        if (state->start()) {
+            UI::u8g.begin();
             state->redraw();
+        }
         else
             close(state);
     };
@@ -120,6 +122,7 @@ void MillControl::start(State &newState, bool open) {
     //Do I need this Idea of a state not starting?
     if (started) {
         //redraw
+        UI::u8g.begin();
         state->redraw();
     } else {
         //restart the old state

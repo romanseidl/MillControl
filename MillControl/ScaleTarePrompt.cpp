@@ -5,11 +5,12 @@
 
 bool ScaleTarePrompt::open() {
     UI::scale.power_up();
+    UI::u8g.begin();
     //Need to wait for the scale to boot up
     delay(2500);
     UI::scale.calibrate_noise();
     UI::scale.reset_floating_weight();
-    return true;
+    return Prompt::start();
 }
 
 
@@ -24,6 +25,7 @@ bool ScaleTarePrompt::start() {
 
 bool ScaleTarePrompt::close() {
     UI::scale.power_down();
+    UI::u8g.begin();
     return State::close();
 }
 
