@@ -78,11 +78,10 @@ Rotator *UI::rotator = new RotatingEncoder(2, 3);
 //=================================================
 // SCALE
 // to activate the scale uncomment the SCALE define in UI.h
-// Setup is scale(data_pin, clock_pin, power_pin) or scale(data_pin, clock_pin) if there is no power_pin
+// Setup is scale(data_pin, clock_pin, power_pin)
 
 #ifdef SCALE
 Scale UI::scale(A1, A2, A3);
-//Scale UI::scale(A1, A2); //without power pin
 #endif
 
 //=================================================
