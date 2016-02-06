@@ -78,11 +78,10 @@ Rotator *UI::rotator = new RotatingEncoder(2, 3);
 //=================================================
 // SCALE
 // to activate the scale uncomment the SCALE define in UI.h
-// Setup is scale(data_pin, clock_pin, power_pin) or scale(data_pin, clock_pin) if there is no power_pin
+// Setup is scale(data_pin, clock_pin, power_pin)
 
 #ifdef SCALE
 Scale UI::scale(A1, A2, A3);
-//Scale UI::scale(A1, A2); //without power pin
 #endif
 
 //=================================================
@@ -140,6 +139,7 @@ U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64_2X(OLED_CS, OLED_MISO, OLED_RESET);
 
 //=================================================
 // PCD 8544 Display
+// PCD IS NOT WORKING AT THE MOMENT!
 
 // Uncomment this if you are using the PCD 8544
 //U8GLIB UI::u8g = U8GLIB_PCD8544(OLED_SCK, OLED_MOSI, OLED_CS, OLED_MISO, OLED_RESET);
