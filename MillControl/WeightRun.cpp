@@ -13,27 +13,28 @@ bool WeightRun::start() {
 
 void WeightRun::loop() {
     weight = max(0, UI::scale.get_floating_weight());
-    if (weight > (run_data - *calibration_data))
-        close();
+    if (weight > (run_data - *calibration_data)) {
+        //Stop Mill etc.
+        Run::close();
+        //Was this a normal end?
+        if (weight > (run_data - *calibration_data)) {
+            //Learn how much the scale is missing out
+            long offset = run_data - UI::scale.get_stable_weight();
+            //only believe offsets up to 0.5 grams
+            if (offset < 0 && offset > -5) {
+                *calibration_data = (*calibration_data + offset) / 2;
+                MillControl::TIME_MODE_SELECTOR.timeModes.eepromWrite();
+            }
+        }
+        UI::scale.power_down();
+    }
     else
         Run::loop();
 }
 
 bool WeightRun::close() {
-    //Was this a normal end?
-    if (weight > (run_data - *calibration_data))
-    {
-        //Learn how much the scale is missing out
-        long offset = run_data - UI::scale.get_stable_weight();
-        //only believe offsets up to 0.5 grams
-        if (offset < 0 && offset > -5) {
-            *calibration_data = (*calibration_data + offset) / 2;
-            MillControl::TIME_MODE_SELECTOR.timeModes.eepromWrite();
-        }
-    }
-    
-    UI::scale.power_down();
     Run::close();
+    UI::scale.power_down();
 }
 
 
