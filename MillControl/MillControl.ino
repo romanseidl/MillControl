@@ -139,6 +139,7 @@ U8GLIB UI::u8g = *new U8GLIB_SSD1306_128X64_2X(OLED_CS, OLED_MISO, OLED_RESET);
 
 //=================================================
 // PCD 8544 Display
+// PCD IS NOT WORKING AT THE MOMENT!
 
 // Uncomment this if you are using the PCD 8544
 //U8GLIB UI::u8g = U8GLIB_PCD8544(OLED_SCK, OLED_MOSI, OLED_CS, OLED_MISO, OLED_RESET);
