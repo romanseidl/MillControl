@@ -24,7 +24,7 @@ void WeightRun::loop() {
         long offset = run_data - UI::scale.get_stable_weight();
         //only believe offsets up to 0.5 grams
         if (offset < 5 && offset > -5) {
-            *calibration_data = (*calibration_data + offset) / 2;
+            *calibration_data = *calibration_data + (offset / 2);
             MillControl::TIME_MODE_SELECTOR.timeModes.eepromWrite();
         }
         UI::scale.power_down();
