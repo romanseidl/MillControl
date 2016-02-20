@@ -23,7 +23,7 @@
 
 class Scale {
 public:
-    static const unsigned char BUFFER_SIZE = 16;
+    static const unsigned char BUFFER_SIZE = 32;
 
 private:
     static const unsigned char EEPROM_VERSION = 4;
