@@ -115,7 +115,7 @@ long Scale::get_floating_weight(unsigned char updates) {
 }
 
 long Scale::get_stable_weight(unsigned char times) {
-    return toWeight(stable_read(times));
+    return toWeight(stable_read(times) - offset);
 }
 
 //meassures the noise level the scale has by running a series of measurements on the scale
