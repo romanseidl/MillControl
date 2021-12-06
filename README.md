@@ -54,8 +54,8 @@ A run can be stopped any time by pressing the button used to start the run. For 
 ### Schematic
 I prefer a old school schmatic style over those fanzy fritzing pictures. Still I added them below in case you prefer them. 
 
-[![Schematic](https://raw.githubusercontent.com/romanseidl/MillControl/gh-pages/sketch/schematic.png)](https://raw.githubusercontent.com/romanseidl/MillControl/gh-pages/sketch/schematic.pdf#gh-light-mode-only)
-![Fancy logo](./Assets/turnoffdarkmode.png#gh-dark-mode-only)
+[![Schematic](./Assets/schematic_2.png)](./Assets/schematic.pdf#gh-light-mode-only)
+![Schematic](./Assets/schematic_darktmode.png#gh-dark-mode-only)
 
 ### (c) 2015 by Roman Seidl
 
