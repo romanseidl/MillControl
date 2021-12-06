@@ -20,16 +20,28 @@ This was designed to build a time controlled coffee grinder out of any regular m
 
 ### User Interface
 #### Select a Time Mode
-You can select from up to 20 timer modes with different timeings for a single click, double click and long click of the mill button. Modes can be timed, start/ stop (starting the mill on a click and stopping it at the next) and hold (_with extra mill button only_).
+You can select from up to 20 timer modes with settings fr time or weight. 
+There are two different time modes: multi selection and single selection (FLAT_MODE in UI.h).
 
-_If there is no mill button then you can only choose from single and double click. Long click is then bound to the edit menu_
+##### multi selection
+For every mode there are timeings for a single click, double click (or mill switch 2, if available) and long click.
+For a click mode you can set a time / weight or "start/stop" (start mill with click start and stopping it at the next) or hold (longer click, only if more buttons are available).
+If there is no mill button then you can only choose from single and double click. Long click is then bound to the edit menu.
 
-##### Portrait mode
-![Select](https://raw.githubusercontent.com/romanseidl/MillControl/gh-pages/pictures/hoch_select.JPG)
-![Select Direct](https://github.com/romanseidl/MillControl/blob/gh-pages/pictures/hoch_select_direct.JPG)
-##### Landscape Mode
-![Select Landscape](https://raw.githubusercontent.com/romanseidl/MillControl/gh-pages/pictures/quer_select.JPG)
-![Select Direct Landscape](https://raw.githubusercontent.com/romanseidl/MillControl/gh-pages/pictures/quer_select_d.JPG)
+###### Portrait mode
+![SelectTimeWeightDirect](./Assets/pictures/timeWeightDirect.png)
+
+###### Landscape Mode
+![SelectTimeWeightDirect](./Assets/pictures/timeWeightDirect_L.png)
+
+##### single selection
+Every time / weight has it own side. With one click will this site be startet. In the direct mode ("start") will one click start the mill until anothe click stopps the mill, hold (the hold function also does something. But not clear what.).
+
+###### Portrait mode
+![SelectTimeWeightDirect](./Assets/pictures/scaleDirect_P.png)
+
+###### Landscape Mode
+![SelectTimeWeightDirect](./Assets/pictures/scaleDirect_L.png)
 
 #### Edit a Time Mode
 There is an extensive editor allowing you to add (+), delete (x), move (<>) and edit time modes. For a time mode the respective times and the title are editable.
@@ -50,6 +62,11 @@ A run can be stopped any time by pressing the button used to start the run. For 
 ![Direct Run Mode](https://raw.githubusercontent.com/romanseidl/MillControl/gh-pages/pictures/hoch_run_direct.JPG)
 ##### Landscape mode
 ![Landscape Run Mode](https://github.com/romanseidl/MillControl/blob/gh-pages/pictures/quer_run.JPG)
+
+### Brew-Timer
+If you set on A0 a "taster" (don't know the english word) you can get a brew-timer. The timer will be cancled by any interaction and cannot be started during the milling process.
+
+![Brewing](./Assets/pictures/brew.png)
 
 ### Schematic
 I prefer a old school schmatic style over those fanzy fritzing pictures. Still I added them below in case you prefer them. 
